@@ -54,7 +54,7 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
                                  DBG("make Node");
                                  // user picked item 1
                                  // NodeComponent を作成してキャンバスに追加
-                                 auto newNode = std::make_unique<NodeComponent>();
+                                 auto newNode = std::make_unique<NodeComponent>(this);
                                  newNode->setBounds(e.getPosition().x, e.getPosition().y, 100, 100);
                                  addAndMakeVisible(newNode.get());
                                  // オブジェクトの所有権をコンポーネントに移す（必要ならば）
