@@ -14,16 +14,28 @@
 class NodeIO : public juce::Component,public juce::DragAndDropTarget
 {
 public:
-    NodeIO()
+    NodeIO(juce::Point<float> lPosition)
     {
+        DBG("NodeIO");
         setSize(20, 20);
-        currentColour = juce::Colours::blue;
+        setLocalPosition(lPosition);
+        setCurrentColour( juce::Colours::blue);
     }
     
     void paint(juce::Graphics& g) override
     {
         g.setColour(currentColour);
         g.fillEllipse(getLocalBounds().toFloat());
+        
+    }
+    
+    juce::Component* getTopLevelComponent(juce::Component* comp)
+    {
+        while (comp->getParentComponent() != nullptr)
+        {
+            comp = comp->getParentComponent();
+        }
+        return comp;
     }
     
     void mouseDrag(const juce::MouseEvent& e) override
@@ -57,21 +69,26 @@ public:
             DBG("source: "+ sourceNodeIO->getUUID().toString());
             DBG("target: "+ this->getUUID().toString());
             
+            if(connectedIO) connectedIO-> setConnectedIO(nullptr);
+            setConnectedIO(sourceNodeIO);
+            DBG("connected: "+ connectedIO->getUUID().toString());
+            
             currentColour = juce::Colours::green;
-            repaint();
+            auto topLevel = getTopLevelComponent(this);
+            topLevel->repaint();
         }
     }
     void itemDragEnter(const SourceDetails &dragSourceDetails) override
     {
         // Highlight or change appearance when a valid item enters
-        currentColour = juce::Colours::blue;
+        setCurrentColour( juce::Colours::blue);
         repaint();
     }
 
     void itemDragExit(const SourceDetails &dragSourceDetails) override
     {
         // Revert appearance change
-        currentColour = juce::Colours::red;
+        setCurrentColour(juce::Colours::red);
         repaint();
     }
     
@@ -79,10 +96,96 @@ public:
         return thisIOUuid;
     }
     
+    void setConnectedIO(NodeIO* otherIO)
+    {
+        connectedIO = otherIO;
+    }
+
+    NodeIO* getConnectedIO()
+    {
+        return connectedIO;
+    }
+    
+    juce::Path getConnectedPath(){
+        juce::Path bezierPath;
+        // 接続先が存在すればベジェ曲線を描画する
+        if (connectedIO)
+        {
+            juce::Point<float> startPoint = getBounds().getCentre().toFloat();  // このNodeIOの中心
+            juce::Point<float> endPoint = connectedIO->getBounds().getCentre().toFloat();  // 接続先NodeIOの中心
+
+            // ベジェ曲線のコントロールポイントを定義（例として、開始点と終了点の中間を使用）
+            juce::Point<float> controlPoint1 = juce::Point<float>((startPoint.x + endPoint.x) * 0.5f, startPoint.y);
+            juce::Point<float> controlPoint2 = juce::Point<float>((startPoint.x + endPoint.x) * 0.5f, endPoint.y);
+
+            DBG("startPoint: "+ startPoint.toString());
+            DBG("endPoint: "+ endPoint.toString());
+            
+            if(startPoint.x<endPoint.x){
+                bezierPath.startNewSubPath(startPoint);
+                bezierPath.cubicTo(controlPoint1, controlPoint2, endPoint);
+            }else{
+                bezierPath.startNewSubPath(endPoint);
+                bezierPath.cubicTo(controlPoint2, controlPoint1, startPoint);
+            }
+            
+        }
+        
+        return bezierPath;
+    }
+    
+    juce::Point<float> getLocalPosition(){
+        return LocalPosition;
+    }
+    
+    void setLocalPosition(juce::Point<float> newPosition){
+        LocalPosition = newPosition;
+    }
+    
+    juce::Colour getCurrentColour() const
+    {
+        return currentColour;
+    }
+    
+    void setCurrentColour(const juce::Colour& colour)
+    {
+        currentColour = colour;
+    }
+    
 private:
     juce::Uuid thisIOUuid;
     juce::Uuid connectedIOUuid = juce::Uuid::null();
+    NodeIO* connectedIO = nullptr;
     juce::Colour currentColour;
+    juce::Point<float> LocalPosition = juce::Point<float>(0,0);
+};
+
+class InputNodeIO : public NodeIO
+{
+public :
+    InputNodeIO(juce::Point<float> lPosition) : NodeIO(lPosition)
+    {
+        DBG("Input");
+        setSize(20, 20);
+        setLocalPosition(lPosition);
+        setCurrentColour(juce::Colours::blue);
+    }
+    
+private:
+};
+
+class OutputNodeIO : public NodeIO
+{
+public :
+    OutputNodeIO(juce::Point<float> lPosition) : NodeIO(lPosition)
+    {
+        DBG("Output");
+        setSize(20, 20);
+        setLocalPosition(lPosition);
+        setCurrentColour(juce::Colours::green);
+    }
+    
+private:
 };
 
 class NodeComponent : public juce::Component
@@ -92,14 +195,21 @@ public:
     {
         DBG("NodeComponent");
         setSize(100, 100);
-
-        // NodeIOの生成
-        auto newNodeIO = std::make_unique<NodeIO>();
         
+        addNodeIO<InputNodeIO>(juce::Point<float>(-10, 20), parentToAttachIO);
+        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 20), parentToAttachIO);
+    }
+    
+    template <typename NodeIOType>
+    void addNodeIO(juce::Point<float> localPosition, juce::Component* parentToAttachIO)
+    {
+        // NodeIOの生成
+        auto newNodeIO = std::make_unique<NodeIOType>(localPosition);
         // NodeIOを指定された親コンポーネントに追加
         parentToAttachIO->addAndMakeVisible(newNodeIO.get());
         nodeIOList.push_back(std::move(newNodeIO));
     }
+
     
     void setBounds(int x, int y, int w, int h)
     {
@@ -111,7 +221,8 @@ public:
     {
         auto position = getPosition();
         for(auto&nodeIO :nodeIOList){
-            nodeIO->setTopLeftPosition(position.x - 10, position.y + getHeight() / 2 - 10);
+            juce::Point<float> localIOPosition = nodeIO->getLocalPosition();
+            nodeIO->setTopLeftPosition(position.x + localIOPosition.x, position.y + localIOPosition.y);
         }
     }
 
@@ -119,6 +230,15 @@ public:
     {
         g.setColour(juce::Colours::blue);
         g.fillRect(getLocalBounds());
+    }
+    
+    juce::Component* getTopLevelComponent(juce::Component* comp)
+    {
+        while (comp->getParentComponent() != nullptr)
+        {
+            comp = comp->getParentComponent();
+        }
+        return comp;
     }
     
     // ドラッグアンドドロップや右クリックメニューの処理
@@ -129,6 +249,10 @@ public:
         {
             originalPosition = getPosition();
             dragging = true;
+            for(auto&nodeIO :nodeIOList){
+                nodeIO -> toFront(true);
+            }
+            toFront(true);
         }
     }
     
@@ -137,6 +261,9 @@ public:
         DBG("Drag");
         setTopLeftPosition(originalPosition + e.getOffsetFromDragStart());
         updateNodeIOPosition();
+        
+        auto topLevel = getTopLevelComponent(this);
+        topLevel->repaint();
     }
     
     void mouseUp(const juce::MouseEvent& e) override
@@ -148,7 +275,20 @@ public:
             dragging = false;
         }
     }
-     
+    
+    std::vector<juce::Path> getConnectedPaths()
+    {
+        std::vector<juce::Path> PathArray;
+
+        for (auto& nodeIO : nodeIOList)  // 仮定：nodeIOListはNodeIOのポインタのベクター
+        {
+            juce::Path bezierPath = nodeIO->getConnectedPath();
+            if(!bezierPath.isEmpty()) PathArray.push_back(bezierPath);
+        }
+
+        return PathArray;
+    }
+    
 private:
     juce::Point<int> originalPosition;
     bool dragging = false;
@@ -166,6 +306,7 @@ public:
 
     //==============================================================================
     void paint (juce::Graphics&) override;
+    void paintOverChildren(juce::Graphics&) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent&) override;
 

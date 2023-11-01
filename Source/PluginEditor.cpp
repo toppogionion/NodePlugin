@@ -29,6 +29,19 @@ void NodePluginAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
+void NodePluginAudioProcessorEditor::paintOverChildren(juce::Graphics& g)
+{
+    g.setColour(juce::Colours::black);
+    
+    for (auto& node : nodeList)  // 仮定：nodeIOListはNodeIOのポインタのベクター
+    {
+        std::vector<juce::Path> PathArray = node->getConnectedPaths();
+        for (auto& bezierPath : PathArray){
+            g.strokePath(bezierPath, juce::PathStrokeType(2.0f));
+        }
+    }
+}
+
 void NodePluginAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
