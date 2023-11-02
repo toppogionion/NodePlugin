@@ -4,6 +4,9 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="WpsWV5" name="NodePlugin">
     <GROUP id="{84AF3384-F44E-9A6C-1578-664E1DC402F3}" name="Source">
+      <FILE id="PSOpc6" name="NodeComponent.cpp" compile="1" resource="0"
+            file="Source/NodeComponent.cpp"/>
+      <FILE id="HRvh40" name="NodeComponent.h" compile="0" resource="0" file="Source/NodeComponent.h"/>
       <FILE id="picoZY" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="yj0bw8" name="PluginProcessor.h" compile="0" resource="0"
