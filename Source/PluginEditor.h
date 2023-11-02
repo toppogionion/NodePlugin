@@ -45,7 +45,7 @@ public:
         
         if (dragContainer != nullptr && !dragContainer->isDragAndDropActive())
         {
-            juce::var dragDescription = "NodeIO";
+            juce::var dragDescription = getType();
             dragContainer->startDragging(dragDescription, this);
         }
     }
@@ -163,6 +163,8 @@ public:
         currentColour = colour;
     }
     
+    virtual juce::String getType() const {return "NodeIO";}
+    
 private:
     juce::Uuid thisIOUuid;
     juce::Uuid connectedIOUuid = juce::Uuid::null();
@@ -182,7 +184,15 @@ public :
         setCurrentColour(juce::Colours::blue);
     }
     
-private:
+    bool isInterestedInDragSource(const SourceDetails& dragSourceDetails) override
+    {
+        // 他のNodeIOからのドラッグを受け入れる場合に真を返します
+        DBG(dragSourceDetails.description.toString());
+        return dragSourceDetails.description.toString() == "OutputIO";
+    }
+    
+    juce::String getType() const override { return "InputIO"; }
+
 };
 
 class OutputNodeIO : public NodeIO
@@ -196,7 +206,15 @@ public :
         setCurrentColour(juce::Colours::green);
     }
     
-private:
+    bool isInterestedInDragSource(const SourceDetails& dragSourceDetails) override
+    {
+        // 他のNodeIOからのドラッグを受け入れる場合に真を返します
+        DBG(dragSourceDetails.description.toString());
+        return dragSourceDetails.description.toString() == "InputIO";
+    }
+    
+    juce::String getType() const override { return "OutputIO"; }
+
 };
 
 class NodeComponent : public juce::Component
@@ -205,7 +223,7 @@ public:
     NodeComponent(juce::Component* parentToAttachIO)
     {
         DBG("NodeComponent");
-        setSize(100, 100);
+        setSize(400, 300);
         
         addNodeIO<InputNodeIO>(juce::Point<float>(-10, 20), parentToAttachIO);
         addNodeIO<OutputNodeIO>(juce::Point<float>(90, 20), parentToAttachIO);
