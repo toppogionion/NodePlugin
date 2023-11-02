@@ -15,7 +15,8 @@ NodePluginAudioProcessorEditor::NodePluginAudioProcessorEditor (NodePluginAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (1000, 1000);
+    
 }
 
 NodePluginAudioProcessorEditor::~NodePluginAudioProcessorEditor()
@@ -48,30 +49,50 @@ void NodePluginAudioProcessorEditor::resized()
     // subcomponents in your editor..
 }
 
+void NodePluginAudioProcessorEditor::mouseDrag(const juce::MouseEvent& e)
+{
+    /*
+    if (e.mods.isMiddleButtonDown()){ // ホイールの場合
+        auto offset = e.getPosition() - lastMousePosition;
+        auto newBounds = getBounds() + offset;
+        
+        DBG(lastMousePosition.toString());
+        setBounds(newBounds); // コンポーネントの位置を更新
+    }
+     */
+}
+
 void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
 {
-    juce::PopupMenu menu;
-    menu.addItem(1, "Add Node");
-    DBG("popup");
+    DBG("mouseDown");
+    /*
     // 他の項目も追加可能
-    
-    menu.showMenuAsync (juce::PopupMenu::Options(),
-                        [this,e] (int result)
-                         {
-                             if (result == 0)
-                             {
-                                 // user dismissed the menu without picking anything
-                             }
-                             else if (result == 1)
-                             {
-                                 DBG("make Node");
-                                 // user picked item 1
-                                 // NodeComponent を作成してキャンバスに追加
-                                 auto newNode = std::make_unique<NodeComponent>(this);
-                                 newNode->setBounds(e.getPosition().x, e.getPosition().y, 100, 100);
-                                 addAndMakeVisible(newNode.get());
-                                 // オブジェクトの所有権をコンポーネントに移す（必要ならば）
-                                 nodeList.push_back(std::move(newNode));
-                             }
-                         });
+    if (e.mods.isMiddleButtonDown()){ // ホイールの場合
+        lastMousePosition = e.getPosition();
+    }
+     */
+    if (e.mods.isRightButtonDown()){ // 右クリックの場合だけ
+        juce::PopupMenu menu;
+        menu.addItem(1, "Add Node");
+        
+        menu.showMenuAsync (juce::PopupMenu::Options(),
+                            [this,e] (int result)
+                            {
+            if (result == 0)
+            {
+                // user dismissed the menu without picking anything
+            }
+            else if (result == 1)
+            {
+                DBG("make Node");
+                // user picked item 1
+                // NodeComponent を作成してキャンバスに追加
+                auto newNode = std::make_unique<NodeComponent>(this);
+                newNode->setBounds(e.getPosition().x, e.getPosition().y, 100, 100);
+                addAndMakeVisible(newNode.get());
+                // オブジェクトの所有権をコンポーネントに移す（必要ならば）
+                nodeList.push_back(std::move(newNode));
+            }
+        });
+    }
 }

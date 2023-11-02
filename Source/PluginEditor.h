@@ -58,26 +58,35 @@ public:
 
     void itemDropped(const SourceDetails& dragSourceDetails) override
     {
-        // TODO: 接続情報を保存する、ビジュアルフィードバックを提供する、などの処理をここに追加する
         // ドラッグされた元の NodeIO を取得
         auto sourceNodeIO = dynamic_cast<NodeIO*>(dragSourceDetails.sourceComponent.get());
 
         if (sourceNodeIO && sourceNodeIO != this) // 自分自身へのドロップを避ける
         {
-            // ここで2つの NodeIO を接続する処理などを行います
-            DBG("NodeIO dropped onto another NodeIO");
-            DBG("source: "+ sourceNodeIO->getUUID().toString());
-            DBG("target: "+ this->getUUID().toString());
-            
-            if(connectedIO) connectedIO-> setConnectedIO(nullptr);
+            if (connectedIO)
+            {
+                connectedIO->setConnectedIO(nullptr);
+                //connectedIO->repaint(); // 可視化を更新するためのrepaint
+            }
+            if (sourceNodeIO->getConnectedIO())
+            {
+                sourceNodeIO->getConnectedIO()->setConnectedIO(nullptr);
+                //sourceNodeIO->getConnectedIO()->repaint(); // 可視化を更新するためのrepaint
+            }
+            // 新たに接続
             setConnectedIO(sourceNodeIO);
+            sourceNodeIO->setConnectedIO(this);
+            
+            DBG("source: "+ getUUID().toString());
             DBG("connected: "+ connectedIO->getUUID().toString());
             
+            // 可視化を更新するためのrepaint
             currentColour = juce::Colours::green;
             auto topLevel = getTopLevelComponent(this);
             topLevel->repaint();
         }
     }
+    
     void itemDragEnter(const SourceDetails &dragSourceDetails) override
     {
         // Highlight or change appearance when a valid item enters
@@ -91,6 +100,8 @@ public:
         setCurrentColour(juce::Colours::red);
         repaint();
     }
+    
+    
     
     juce::Uuid getUUID(){
         return thisIOUuid;
@@ -118,8 +129,8 @@ public:
             juce::Point<float> controlPoint1 = juce::Point<float>((startPoint.x + endPoint.x) * 0.5f, startPoint.y);
             juce::Point<float> controlPoint2 = juce::Point<float>((startPoint.x + endPoint.x) * 0.5f, endPoint.y);
 
-            DBG("startPoint: "+ startPoint.toString());
-            DBG("endPoint: "+ endPoint.toString());
+            //DBG("startPoint: "+ startPoint.toString());
+            //DBG("endPoint: "+ endPoint.toString());
             
             if(startPoint.x<endPoint.x){
                 bezierPath.startNewSubPath(startPoint);
@@ -259,11 +270,13 @@ public:
     void mouseDrag(const juce::MouseEvent& e) override
     {
         DBG("Drag");
-        setTopLeftPosition(originalPosition + e.getOffsetFromDragStart());
-        updateNodeIOPosition();
-        
-        auto topLevel = getTopLevelComponent(this);
-        topLevel->repaint();
+        if (e.mods.isLeftButtonDown()){
+            setTopLeftPosition(originalPosition + e.getOffsetFromDragStart());
+            updateNodeIOPosition();
+            
+            auto topLevel = getTopLevelComponent(this);
+            topLevel->repaint();
+        }
     }
     
     void mouseUp(const juce::MouseEvent& e) override
@@ -295,6 +308,7 @@ private:
     std::vector<std::unique_ptr<NodeIO>> nodeIOList;
 };
 
+
 //==============================================================================
 /**
 */
@@ -308,6 +322,7 @@ public:
     void paint (juce::Graphics&) override;
     void paintOverChildren(juce::Graphics&) override;
     void resized() override;
+    void mouseDrag(const juce::MouseEvent&) override;
     void mouseDown(const juce::MouseEvent&) override;
 
 private:
@@ -317,6 +332,8 @@ private:
     
     // メンバ変数としてstd::vector<std::unique_ptr<NodeComponent>> nodeListを定義
     std::vector<std::unique_ptr<NodeComponent>> nodeList;
+    
+    juce::Point<int> lastMousePosition;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodePluginAudioProcessorEditor)
 };
