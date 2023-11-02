@@ -133,11 +133,11 @@ public:
             //DBG("endPoint: "+ endPoint.toString());
             
             if(startPoint.x<endPoint.x){
-                bezierPath.startNewSubPath(startPoint);
-                bezierPath.cubicTo(controlPoint1, controlPoint2, endPoint);
+                bezierPath.startNewSubPath(startPoint + juce::Point<float>(10,0));
+                bezierPath.cubicTo(controlPoint1, controlPoint2, endPoint + juce::Point<float>(-10,0));
             }else{
-                bezierPath.startNewSubPath(endPoint);
-                bezierPath.cubicTo(controlPoint2, controlPoint1, startPoint);
+                bezierPath.startNewSubPath(endPoint  + juce::Point<float>(10,0));
+                bezierPath.cubicTo(controlPoint2, controlPoint1, startPoint  + juce::Point<float>(-10,0));
             }
             
         }
@@ -313,8 +313,10 @@ public:
 
         for (auto& nodeIO : nodeIOList)  // 仮定：nodeIOListはNodeIOのポインタのベクター
         {
-            juce::Path bezierPath = nodeIO->getConnectedPath();
-            if(!bezierPath.isEmpty()) PathArray.push_back(bezierPath);
+            if(nodeIO->getType()=="OutputIO"){
+                juce::Path bezierPath = nodeIO->getConnectedPath();
+                if(!bezierPath.isEmpty()) PathArray.push_back(bezierPath);
+            }
         }
 
         return PathArray;
