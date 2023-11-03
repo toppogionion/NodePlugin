@@ -79,11 +79,60 @@ class OutputNodeIO : public NodeIO
 {
 public :
     OutputNodeIO(juce::Point<float> );
-    
+
     bool isInterestedInDragSource(const SourceDetails& ) override;
     
     juce::String getType() const override;
 
+};
+
+
+//==============================================================================
+
+
+class HeaderComponent : public juce::Component
+{
+public:
+    HeaderComponent();
+
+    void setTitle(const juce::String& );
+
+    void paint(juce::Graphics& ) override;
+
+    void resized() override;
+
+    void mouseDown(const juce::MouseEvent& ) override;
+
+    void mouseDrag(const juce::MouseEvent& ) override;
+
+    void mouseUp(const juce::MouseEvent& ) override;
+    
+private:
+    juce::Label titleLabel;
+};
+
+
+//==============================================================================
+
+
+class BodyComponent : public juce::Component
+{
+public:
+    template <typename ComponentType, typename... Args>
+    ComponentType& addCustomComponent(Args&&... args)
+    {
+        auto* newComponent = new ComponentType(std::forward<Args>(args)...);
+        addAndMakeVisible(newComponent);
+        customComponents.add(newComponent);
+        return *newComponent;
+    }
+
+    void paint(juce::Graphics& ) override;
+
+    void resized() override;
+
+private:
+    juce::OwnedArray<juce::Component> customComponents;
 };
 
 
@@ -104,13 +153,14 @@ public:
         parentToAttachIO->addAndMakeVisible(newNodeIO.get());
         nodeIOList.push_back(std::move(newNodeIO));
     }
-
     
     void setBounds(int x, int y, int w, int h);
     
     void updateNodeIOPosition();
 
     void paint(juce::Graphics& ) override;
+    
+    void resized() override;
     
     juce::Component* getTopLevelComponent(juce::Component* );
     // ドラッグアンドドロップや右クリックメニューの処理
@@ -126,4 +176,8 @@ private:
     juce::Point<int> originalPosition;
     bool dragging = false;
     std::vector<std::unique_ptr<NodeIO>> nodeIOList;
+    
+protected:
+    HeaderComponent headerComponent;
+    BodyComponent bodyComponent;
 };

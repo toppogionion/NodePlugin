@@ -204,14 +204,99 @@ juce::String OutputNodeIO::getType() const  { return "OutputIO"; }
 
 //==============================================================================
 
+HeaderComponent::HeaderComponent()
+{
+    addAndMakeVisible(titleLabel);
+    titleLabel.setInterceptsMouseClicks(false, false); 
+}
+
+void HeaderComponent::setTitle(const juce::String& title)
+{
+    titleLabel.setText(title, juce::dontSendNotification);
+}
+
+void HeaderComponent::paint(juce::Graphics& g)
+{
+    g.fillAll(juce::Colours::darkgrey); // ヘッダーの背景色
+}
+
+void HeaderComponent::resized()
+{
+    titleLabel.setBounds(getLocalBounds());
+}
+
+void HeaderComponent::mouseDown(const juce::MouseEvent& event)
+{
+    // NodeComponent にイベントを転送
+    auto* parent = findParentComponentOfClass<NodeComponent>();
+    if (parent != nullptr)
+    {
+        parent->mouseDown(event.getEventRelativeTo(parent));
+    }
+}
+
+void HeaderComponent::mouseDrag(const juce::MouseEvent& event)
+{
+    // NodeComponent にイベントを転送
+    auto* parent = findParentComponentOfClass<NodeComponent>();
+    if (parent != nullptr)
+    {
+        parent->mouseDrag(event.getEventRelativeTo(parent));
+    }
+}
+
+void HeaderComponent::mouseUp(const juce::MouseEvent& event)
+{
+    // NodeComponent にイベントを転送
+    auto* parent = findParentComponentOfClass<NodeComponent>();
+    if (parent != nullptr)
+    {
+        parent->mouseUp(event.getEventRelativeTo(parent));
+    }
+}
+    
+
+
+//==============================================================================
+
+
+void BodyComponent::paint(juce::Graphics& g)
+{
+    g.fillAll(juce::Colours::white); // ボディの背景色
+}
+
+void BodyComponent::resized()
+{
+    // ここで customComponents 内のコンポーネントのレイアウトを設定
+    auto area = getLocalBounds();  // ボディの領域を取得
+
+    for (auto* comp : customComponents)
+    {
+        comp->setBounds(area.removeFromTop(50));  // 各コンポーネントのサイズを設定
+        area.removeFromTop(10);  // コンポーネント間の間隔を空ける
+    }
+
+}
+
+
+//==============================================================================
+
 
 NodeComponent::NodeComponent(juce::Component* parentToAttachIO)
 {
     DBG("NodeComponent");
-    setSize(400, 300);
+    setSize(800, 600);
     
     addNodeIO<InputNodeIO>(juce::Point<float>(-10, 20), parentToAttachIO);
     addNodeIO<OutputNodeIO>(juce::Point<float>(90, 20), parentToAttachIO);
+    // ヘッダーにタイトルを設定
+    headerComponent.setTitle("My Node Title");
+    addAndMakeVisible(headerComponent);  // ヘッダーを可視にする
+
+    // ボディにスライダーを追加
+    auto& slider = bodyComponent.addCustomComponent<juce::Slider>();
+    addAndMakeVisible(bodyComponent);  // ボディを可視にする
+    headerComponent.toFront(true);
 }
 
 void NodeComponent::setBounds(int x, int y, int w, int h)
@@ -233,6 +318,14 @@ void NodeComponent::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::blue);
     g.fillRect(getLocalBounds());
+}
+
+void NodeComponent::resized() {
+    // コンポーネントのリサイズ処理
+    auto area = getLocalBounds();
+    headerComponent.setBounds(area.removeFromTop(30)); // ヘッダーの高さを30に設定
+    bodyComponent.setBounds(area); // 残りの領域をボディに割り当て
+    headerComponent.toFront(true);
 }
 
 juce::Component* NodeComponent::getTopLevelComponent(juce::Component* comp)
