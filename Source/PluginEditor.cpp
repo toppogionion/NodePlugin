@@ -90,9 +90,21 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
                 auto newNode = std::make_unique<NodeComponent>(this);
                 newNode->setBounds(e.getPosition().x, e.getPosition().y, 100, 100);
                 addAndMakeVisible(newNode.get());
+                newNode->addListener(this);
                 // オブジェクトの所有権をコンポーネントに移す（必要ならば）
                 nodeList.push_back(std::move(newNode));
             }
         });
     }
+}
+
+void NodePluginAudioProcessorEditor::nodeComponentWillBeDeleted(NodeComponent* nodeComponent)
+{
+    nodeList.erase(std::remove_if(nodeList.begin(), nodeList.end(),
+                                  [nodeComponent](const std::unique_ptr<NodeComponent>& ptr)
+                                  {
+                                      return ptr.get() == nodeComponent;
+                                  }),
+                   nodeList.end());
+    repaint();
 }

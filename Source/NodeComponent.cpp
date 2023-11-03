@@ -341,7 +341,40 @@ juce::Component* NodeComponent::getTopLevelComponent(juce::Component* comp)
 void NodeComponent::mouseDown(const juce::MouseEvent& e)
 {
     DBG("Down");
-    if (e.mods.isLeftButtonDown()) // 左クリックの場合だけ
+    if (e.mods.isRightButtonDown()) // 右クリックの場合
+    {
+        juce::PopupMenu menu;
+        menu.addItem(1, "Delete");
+        
+        menu.showMenuAsync (juce::PopupMenu::Options(),
+                            [this,e] (int result)
+                            {
+            if (result == 0)
+            {
+                // user dismissed the menu without picking anything
+            }
+            else if (result == 1)
+            {
+                // NodeIOの接続を解除する処理
+                for (auto& nodeIO : nodeIOList)
+                {
+                    if (auto* connectedIO = nodeIO->getConnectedIO())
+                    {
+                        connectedIO->setConnectedIO(nullptr); // 接続を解除
+                    }
+                }
+                // リスナーに通知
+                listeners.call([this](NodeComponentListener& listener) { listener.nodeComponentWillBeDeleted(this); });
+                // NodeComponent を削除する処理
+                if (auto* parent = getParentComponent())
+                {
+                    parent->removeChildComponent(this);
+                    delete this;
+                }
+            }
+        });
+    }
+    else if (e.mods.isLeftButtonDown()) // 左クリックの場合だけ
     {
         originalPosition = getPosition();
         dragging = true;
@@ -387,4 +420,14 @@ std::vector<juce::Path> NodeComponent::getConnectedPaths()
     }
 
     return PathArray;
+}
+
+void NodeComponent::addListener(NodeComponentListener* listener)
+{
+    listeners.add(listener);
+}
+
+void NodeComponent::removeListener(NodeComponentListener* listener)
+{
+    listeners.remove(listener);
 }

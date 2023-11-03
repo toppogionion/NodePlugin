@@ -10,11 +10,12 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "NodeComponent.h"
+#include "NodeComponentListener.h"
 
 //==============================================================================
 /**
 */
-class NodePluginAudioProcessorEditor  : public juce::AudioProcessorEditor,public juce::DragAndDropContainer
+class NodePluginAudioProcessorEditor  : public juce::AudioProcessorEditor,public juce::DragAndDropContainer, public NodeComponentListener
 {
 public:
     NodePluginAudioProcessorEditor (NodePluginAudioProcessor&);
@@ -26,6 +27,7 @@ public:
     void resized() override;
     void mouseDrag(const juce::MouseEvent&) override;
     void mouseDown(const juce::MouseEvent&) override;
+    void nodeComponentWillBeDeleted(NodeComponent* ) override;
 
 private:
     // This reference is provided as a quick way for your editor to

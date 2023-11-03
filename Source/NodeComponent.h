@@ -10,6 +10,7 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include "NodeComponentListener.h"
 
 class NodeIO : public juce::Component,public juce::DragAndDropTarget
 {
@@ -172,6 +173,10 @@ public:
     
     std::vector<juce::Path> getConnectedPaths();
     
+    void addListener(NodeComponentListener* );
+
+    void removeListener(NodeComponentListener* );
+    
 private:
     juce::Point<int> originalPosition;
     bool dragging = false;
@@ -180,4 +185,5 @@ private:
 protected:
     HeaderComponent headerComponent;
     BodyComponent bodyComponent;
+    juce::ListenerList<NodeComponentListener> listeners;
 };
