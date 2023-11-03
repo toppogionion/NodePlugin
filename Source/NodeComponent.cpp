@@ -305,6 +305,13 @@ void NodeComponent::setBounds(int x, int y, int w, int h)
     updateNodeIOPosition();
 }
 
+void NodeComponent::translate(juce::Point<int> deltaPos)
+{
+    auto currentPosition = getPosition();
+    setTopLeftPosition(currentPosition + deltaPos);
+    updateNodeIOPosition();
+}
+
 void NodeComponent::updateNodeIOPosition()
 {
     auto position = getPosition();

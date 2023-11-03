@@ -157,6 +157,8 @@ public:
     
     void setBounds(int x, int y, int w, int h);
     
+    void translate(juce::Point<int> );
+    
     void updateNodeIOPosition();
 
     void paint(juce::Graphics& ) override;

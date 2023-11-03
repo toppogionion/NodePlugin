@@ -37,7 +37,7 @@ private:
     // メンバ変数としてstd::vector<std::unique_ptr<NodeComponent>> nodeListを定義
     std::vector<std::unique_ptr<NodeComponent>> nodeList;
     
-    //juce::Point<int> lastMousePosition;
+    juce::Point<int> lastMousePosition;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodePluginAudioProcessorEditor)
 };

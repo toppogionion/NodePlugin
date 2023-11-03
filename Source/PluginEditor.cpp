@@ -51,26 +51,24 @@ void NodePluginAudioProcessorEditor::resized()
 
 void NodePluginAudioProcessorEditor::mouseDrag(const juce::MouseEvent& e)
 {
-    /*
     if (e.mods.isMiddleButtonDown()){ // ホイールの場合
         auto offset = e.getPosition() - lastMousePosition;
-        auto newBounds = getBounds() + offset;
-        
-        DBG(lastMousePosition.toString());
-        setBounds(newBounds); // コンポーネントの位置を更新
+        lastMousePosition = e.getPosition();
+        for (auto& node : nodeList)  // 仮定：nodeIOListはNodeIOのポインタのベクター
+        {
+            node -> translate(offset);
+        }
+        repaint();
     }
-     */
 }
 
 void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
 {
     DBG("mouseDown");
-    /*
     // 他の項目も追加可能
     if (e.mods.isMiddleButtonDown()){ // ホイールの場合
         lastMousePosition = e.getPosition();
     }
-     */
     if (e.mods.isRightButtonDown()){ // 右クリックの場合だけ
         juce::PopupMenu menu;
         menu.addItem(1, "Add Node");
