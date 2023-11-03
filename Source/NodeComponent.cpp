@@ -15,7 +15,7 @@ NodeIO::NodeIO(juce::Point<float> lPosition)
     DBG("NodeIO");
     setSize(20, 20);
     setLocalPosition(lPosition);
-    setCurrentColour( juce::Colours::blue);
+    setCurrentColour( juce::Colours::lightgrey);
 }
 
 void NodeIO::paint(juce::Graphics& g)
@@ -78,6 +78,7 @@ void NodeIO::itemDropped(const SourceDetails& dragSourceDetails)
         
         // 可視化を更新するためのrepaint
         currentColour = juce::Colours::green;
+        sourceNodeIO->setCurrentColour(juce::Colours::green);
         auto topLevel = getTopLevelComponent(this);
         topLevel->repaint();
     }
@@ -86,14 +87,14 @@ void NodeIO::itemDropped(const SourceDetails& dragSourceDetails)
 void NodeIO::itemDragEnter(const SourceDetails &dragSourceDetails)
 {
     // Highlight or change appearance when a valid item enters
-    setCurrentColour( juce::Colours::blue);
+    setCurrentColour( juce::Colours::green);
     repaint();
 }
 
 void NodeIO::itemDragExit(const SourceDetails &dragSourceDetails)
 {
     // Revert appearance change
-    setCurrentColour(juce::Colours::red);
+    setCurrentColour(juce::Colours::lightgrey);
     repaint();
 }
 
@@ -104,6 +105,7 @@ juce::Uuid NodeIO::getUUID(){
 void NodeIO::setConnectedIO(NodeIO* otherIO)
 {
     connectedIO = otherIO;
+    if(connectedIO == nullptr)setCurrentColour(juce::Colours::lightgrey);
 }
 
 NodeIO* NodeIO::getConnectedIO()
@@ -168,7 +170,7 @@ InputNodeIO::InputNodeIO(juce::Point<float> lPosition) : NodeIO(lPosition)
     DBG("Input");
     setSize(20, 20);
     setLocalPosition(lPosition);
-    setCurrentColour(juce::Colours::blue);
+    setCurrentColour(juce::Colours::lightgrey);
 }
 
 bool InputNodeIO::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
@@ -189,7 +191,7 @@ OutputNodeIO::OutputNodeIO(juce::Point<float> lPosition) : NodeIO(lPosition)
     DBG("Output");
     setSize(20, 20);
     setLocalPosition(lPosition);
-    setCurrentColour(juce::Colours::green);
+    setCurrentColour(juce::Colours::lightgrey);
 }
 
 bool OutputNodeIO::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
