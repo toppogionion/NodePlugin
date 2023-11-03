@@ -15,8 +15,11 @@ NodePluginAudioProcessorEditor::NodePluginAudioProcessorEditor (NodePluginAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (1200, 800);
-    
+    // ウィンドウのサイズ変更を有効にする
+    setResizable(true, true);
+    setResizeLimits(400, 300, 1200, 800); // ウィンドウの最小サイズと最大サイズを設定
+
+    setSize (800, 600);
 }
 
 NodePluginAudioProcessorEditor::~NodePluginAudioProcessorEditor()
