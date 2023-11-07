@@ -6,9 +6,7 @@
     <GROUP id="{84AF3384-F44E-9A6C-1578-664E1DC402F3}" name="Source">
       <FILE id="IRLWFx" name="EffectComponents.h" compile="0" resource="0"
             file="Source/EffectComponents.h"/>
-      <FILE id="gJdQqe" name="EffectManager.h" compile="0" resource="0" file="Source/EffectManager.h"/>
       <GROUP id="{57C34172-EBFA-7077-DC7B-1426ACECEBDF}" name="Effects">
-        <FILE id="CfmOSF" name="BaseEffect.h" compile="0" resource="0" file="Source/BaseEffect.h"/>
         <FILE id="gRwqNE" name="Effects.h" compile="0" resource="0" file="Source/Effects.h"/>
         <FILE id="cOu7Xo" name="Input.h" compile="0" resource="0" file="Source/Input.h"/>
         <FILE id="YP49CI" name="InputComponent.h" compile="0" resource="0"
@@ -19,9 +17,11 @@
       </GROUP>
       <FILE id="Mntv5c" name="NodeComponentListener.h" compile="0" resource="0"
             file="Source/NodeComponentListener.h"/>
+      <FILE id="HRvh40" name="NodeComponent.h" compile="0" resource="0" file="Source/NodeComponent.h"/>
       <FILE id="PSOpc6" name="NodeComponent.cpp" compile="1" resource="0"
             file="Source/NodeComponent.cpp"/>
-      <FILE id="HRvh40" name="NodeComponent.h" compile="0" resource="0" file="Source/NodeComponent.h"/>
+      <FILE id="CfmOSF" name="BaseEffect.h" compile="0" resource="0" file="Source/BaseEffect.h"/>
+      <FILE id="xXTJDz" name="BaseEffect.cpp" compile="1" resource="0" file="Source/BaseEffect.cpp"/>
       <FILE id="picoZY" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="yj0bw8" name="PluginProcessor.h" compile="0" resource="0"

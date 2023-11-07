@@ -13,7 +13,7 @@
 
 class BaseEffect : public juce::AudioProcessor {
 public:
-    BaseEffect();
+    explicit BaseEffect(const juce::String& effectName);
     virtual ~BaseEffect();
 
     // 共通の初期化処理
@@ -40,7 +40,6 @@ public:
 
     // UI関連の情報
     juce::Point<int> position; // エフェクトのUI位置
-    juce::String name; // エフェクトの名前
     int numInputs; // 入力端子の数
     int numOutputs; // 出力端子の数
 
@@ -53,4 +52,6 @@ public:
     int getNumInputs() const;
     void setNumOutputs(int newNumOutputs);
     int getNumOutputs() const;
+    
+    juce::String name; // エフェクトの名前
 };
