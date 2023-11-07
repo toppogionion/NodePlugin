@@ -12,7 +12,10 @@
 
 
 BaseEffect::BaseEffect(const juce::String& effectName)
-: name(effectName), numInputs(0), numOutputs(0)  {
+: name(effectName), numInputs(0), numOutputs(0), AudioProcessor (BusesProperties()
+  .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+  .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+  )  {
     // コンストラクタの初期化リストでメンバ変数を初期化
     position = juce::Point<int>(0,0);
 }

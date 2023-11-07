@@ -23,13 +23,7 @@ NodePluginAudioProcessor::NodePluginAudioProcessor()
                        )
 #endif
 {
-    // Input/Outputノードを追加
-    inputEffect = createEffect<InputEffector>();
-    outputEffect = createEffect<OutputEffector>();
-    
-    for (BaseEffect* effect : effects) {
-        DBG(effect->getName());
-    }
+   
 }
 
 NodePluginAudioProcessor::~NodePluginAudioProcessor()
@@ -107,6 +101,35 @@ void NodePluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
                                   getTotalNumOutputChannels(),
                                   sampleRate, samplesPerBlock);
     audioGraph.prepareToPlay(sampleRate, samplesPerBlock);
+    
+    // 入力ノードの作成
+    dawInputNode = audioGraph.addNode(std::make_unique<juce::AudioProcessorGraph::AudioGraphIOProcessor>(juce::AudioProcessorGraph::AudioGraphIOProcessor::audioInputNode));
+    dawOutputNode = audioGraph.addNode(std::make_unique<juce::AudioProcessorGraph::AudioGraphIOProcessor>(juce::AudioProcessorGraph::AudioGraphIOProcessor::audioOutputNode));
+
+    // Input/Outputノードを追加
+    inputEffect = createEffect<InputEffector>();
+    outputEffect = createEffect<OutputEffector>();
+    
+    DBG(juce::String(dawInputNode->nodeID.uid));
+    DBG(juce::String(findNodeForProcessor(inputEffect)->nodeID.uid));
+    DBG(juce::String(findNodeForProcessor(outputEffect)->nodeID.uid));
+    DBG(juce::String(dawOutputNode->nodeID.uid));
+    
+    audioGraph.addConnection({{dawInputNode->nodeID, 0}, {findNodeForProcessor(inputEffect)->nodeID, 0}});
+    audioGraph.addConnection({{dawInputNode->nodeID, 1}, {findNodeForProcessor(inputEffect)->nodeID, 1}});
+    
+    audioGraph.addConnection({{findNodeForProcessor(outputEffect)->nodeID, 0}, {dawOutputNode->nodeID, 0}});
+    audioGraph.addConnection({{findNodeForProcessor(outputEffect)->nodeID, 1}, {dawOutputNode->nodeID, 1}});
+    
+    audioGraph.addConnection({{findNodeForProcessor(inputEffect)->nodeID, 0}, {findNodeForProcessor(outputEffect)->nodeID, 0}});
+    audioGraph.addConnection({{findNodeForProcessor(inputEffect)->nodeID, 1}, {findNodeForProcessor(outputEffect)->nodeID, 1}});
+    //audioGraph.addConnection({{dawInputNode->nodeID, 0}, {dawOutputNode->nodeID, 0}});
+    //audioGraph.addConnection({{dawInputNode->nodeID, 1}, {dawOutputNode->nodeID, 1}});
+    
+    
+    for (BaseEffect* effect : effects) {
+        DBG(effect->getName());
+    }
 }
 
 void NodePluginAudioProcessor::releaseResources()
@@ -143,8 +166,6 @@ bool NodePluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 
 void NodePluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    // バッファーをクリアしてからグラフに処理を委ねる
-    buffer.clear();
     audioGraph.processBlock(buffer, midiMessages);
 }
 

@@ -97,6 +97,8 @@ private:
     BaseEffect* inputEffect;
     BaseEffect* outputEffect;
     juce::AudioProcessorGraph audioGraph;
+    juce::AudioProcessorGraph::Node::Ptr  dawInputNode;
+    juce::AudioProcessorGraph::Node::Ptr  dawOutputNode;
     std::vector<BaseEffect*> effects;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodePluginAudioProcessor)
 };
