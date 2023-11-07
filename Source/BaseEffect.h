@@ -35,9 +35,25 @@ public:
     }
 
     // エフェクト固有の処理を行うメソッド
-    virtual void processEffect(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) = 0;
+    void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) override {
+        // 共通の処理をここに書く
+    }
     
 
+    struct Connection{
+        BaseEffect* connectedEffect;
+        int channel;
+        
+        Connection() : connectedEffect(nullptr), channel(-1) {}
+    };
+    std::vector<Connection> inputConnections;  // 入力接続のベクトル
+    std::vector<Connection> outputConnections; // 出力接続のベクトル
+    
+    // 特定のチャンネルにエフェクトを接続
+    void connectEffectToInput(int inputChannel, BaseEffect* effect) ;
+
+    void connectEffectToOutput(int outputChannel, BaseEffect* effect);
+    
     // UI関連の情報
     juce::Point<int> position; // エフェクトのUI位置
     int numInputs; // 入力端子の数

@@ -14,10 +14,23 @@
 BaseEffect::BaseEffect(const juce::String& effectName)
 : name(effectName), numInputs(0), numOutputs(0)  {
     // コンストラクタの初期化リストでメンバ変数を初期化
+    position = juce::Point<int>(0,0);
 }
 
 BaseEffect::~BaseEffect() {
     // 必要に応じてリソース解放のコードをここに記述
+}
+
+void BaseEffect::connectEffectToInput(int inputChannel, BaseEffect* effect) {
+    if (inputChannel < inputConnections.size()) {
+        inputConnections[inputChannel].connectedEffect = effect;
+    }
+}
+
+void BaseEffect::connectEffectToOutput(int outputChannel, BaseEffect* effect) {
+    if (outputChannel < outputConnections.size()) {
+        outputConnections[outputChannel].connectedEffect = effect;
+    }
 }
 
 const juce::String BaseEffect::getName() const {
@@ -34,6 +47,7 @@ juce::Point<int> BaseEffect::getPosition() const {
 
 void BaseEffect::setNumInputs(int newNumInputs) {
     numInputs = newNumInputs; // 入力端子数を設定
+    inputConnections.resize(numInputs); // 入力接続の数を変更
 }
 
 int BaseEffect::getNumInputs() const {
@@ -42,6 +56,7 @@ int BaseEffect::getNumInputs() const {
 
 void BaseEffect::setNumOutputs(int newNumOutputs) {
     numOutputs = newNumOutputs; // 出力端子数を設定
+    outputConnections.resize(numOutputs); // 出力接続の数を変更
 }
 
 int BaseEffect::getNumOutputs() const {

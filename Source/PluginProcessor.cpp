@@ -24,7 +24,12 @@ NodePluginAudioProcessor::NodePluginAudioProcessor()
 #endif
 {
     // Input/Outputノードを追加
+    inputEffect = createEffect<InputEffector>();
+    outputEffect = createEffect<OutputEffector>();
     
+    for (BaseEffect* effect : effects) {
+        DBG(effect->getName());
+    }
 }
 
 NodePluginAudioProcessor::~NodePluginAudioProcessor()
@@ -98,6 +103,10 @@ void NodePluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    audioGraph.setPlayConfigDetails(getTotalNumInputChannels(),
+                                  getTotalNumOutputChannels(),
+                                  sampleRate, samplesPerBlock);
+    audioGraph.prepareToPlay(sampleRate, samplesPerBlock);
 }
 
 void NodePluginAudioProcessor::releaseResources()
@@ -134,7 +143,8 @@ bool NodePluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 
 void NodePluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    // AudioProcessorGraphの処理を実行
+    // バッファーをクリアしてからグラフに処理を委ねる
+    buffer.clear();
     audioGraph.processBlock(buffer, midiMessages);
 }
 
@@ -161,6 +171,94 @@ void NodePluginAudioProcessor::setStateInformation (const void* data, int sizeIn
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+// エフェクトを追加する
+void NodePluginAudioProcessor::addGraph(std::unique_ptr<BaseEffect> effect) {
+    auto node = audioGraph.addNode(std::move(effect));
+    // 追加したエフェクトのノードを接続するなどの処理
+    if (!node)
+    {
+        // ノードの追加に成功した場合の処理
+        DBG("ノードの追加に失敗しました。");
+    }
+}
+
+// エフェクトを削除する
+void NodePluginAudioProcessor::removeGraph(BaseEffect* effect) {
+    auto node = findNodeForProcessor(effect);
+    if (node) {
+        audioGraph.removeNode(node->nodeID);
+    }
+}
+
+// エフェクト間を接続する
+void NodePluginAudioProcessor::connectGraph(BaseEffect* outputEffect, int outputChannel, BaseEffect* inputEffect, int inputChannel) {
+    auto outputNode = findNodeForProcessor(outputEffect);
+    auto inputNode = findNodeForProcessor(inputEffect);
+    if (outputNode && inputNode) {
+        audioGraph.addConnection({ {outputNode->nodeID, outputChannel}, {inputNode->nodeID, inputChannel} });
+    }
+}
+
+// エフェクトの接続を解除する
+void NodePluginAudioProcessor::disconnectGraph(BaseEffect* effect) {
+    auto node = findNodeForProcessor(effect);
+    if (node) {
+        audioGraph.disconnectNode(node->nodeID);
+    }
+}
+
+// ヘルパー関数: プロセッサに対応するノードを見つける
+juce::AudioProcessorGraph::Node::Ptr NodePluginAudioProcessor::findNodeForProcessor(BaseEffect* processor) {
+    for (auto* node : audioGraph.getNodes()) {
+        if (node->getProcessor() == processor) {
+            return node;
+        }
+    }
+    return nullptr;
+}
+
+bool NodePluginAudioProcessor::isOutputReachableFromAnyNode(BaseEffect* startEffect,BaseEffect* endEffect) {
+    // 出力ノードに至る経路が存在するか確認する関数
+
+    juce::AudioProcessorGraph::Node::Ptr startNode = findNodeForProcessor(startEffect);
+    juce::AudioProcessorGraph::Node::Ptr endNode = findNodeForProcessor(endEffect);
+    if(!(startNode && endNode)) return false;
+    
+    // 出力ノードから逆方向に到達可能なノードを追跡する集合
+    std::set<juce::AudioProcessorGraph::NodeID> visitedNodes;
+
+    // 出力ノードからスタート
+    std::queue<juce::AudioProcessorGraph::NodeID> nodesToVisit;
+    nodesToVisit.push(endNode->nodeID);
+    visitedNodes.insert(endNode->nodeID);
+
+    while (!nodesToVisit.empty()) {
+        auto currentNodeID = nodesToVisit.front();
+        nodesToVisit.pop();
+
+        // 現在のノードへの入力を持つ接続を全て取得
+        for (auto& connection : audioGraph.getConnections()) {
+            if (connection.destination.nodeID == currentNodeID) {
+                juce::AudioProcessorGraph::NodeID sourceNodeID = connection.source.nodeID;
+
+                // 既に訪れたノードでなければ、探索リストに追加
+                if (visitedNodes.find(sourceNodeID) == visitedNodes.end()) {
+                    nodesToVisit.push(sourceNodeID);
+                    visitedNodes.insert(sourceNodeID);
+
+                    // 生成元がオーディオ入力でない場合は、そのノードも有効な信号源と見なせる
+                    if (sourceNodeID != startNode->nodeID) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    // 出力ノードに至る経路が見つからなければ false
+    return false;
 }
 
 //==============================================================================
