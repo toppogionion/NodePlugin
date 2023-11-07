@@ -17,4 +17,5 @@ class NodeComponentListener
 public:
     virtual ~NodeComponentListener() = default;
     virtual void nodeComponentWillBeDeleted(NodeComponent* nodeComponent) = 0;
+    virtual void nodeComponentConnectionChanged(NodeComponent* nodeComponent) = 0;
 };

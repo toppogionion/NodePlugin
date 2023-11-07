@@ -20,6 +20,7 @@ NodePluginAudioProcessorEditor::NodePluginAudioProcessorEditor (NodePluginAudioP
     setResizeLimits(400, 300, 1200, 800); // ウィンドウの最小サイズと最大サイズを設定
 
     setSize (800, 600);
+            
 }
 
 NodePluginAudioProcessorEditor::~NodePluginAudioProcessorEditor()
@@ -87,6 +88,7 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
             {
                 DBG("make Node");
                 // user picked item 1
+                /*
                 // NodeComponent を作成してキャンバスに追加
                 auto newNode = std::make_unique<NodeComponent>(this);
                 newNode->setBounds(e.getPosition().x, e.getPosition().y, 100, 100);
@@ -94,6 +96,7 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
                 newNode->addListener(this);
                 // オブジェクトの所有権をコンポーネントに移す（必要ならば）
                 nodeList.push_back(std::move(newNode));
+                 */
             }
         });
     }
@@ -108,4 +111,10 @@ void NodePluginAudioProcessorEditor::nodeComponentWillBeDeleted(NodeComponent* n
                                   }),
                    nodeList.end());
     repaint();
+}
+
+void NodePluginAudioProcessorEditor::nodeComponentConnectionChanged(NodeComponent* nodeComponent)
+{
+        // NodeComponentの接続状態が変更されたときの処理
+        // 例: AudioProcessorGraphの接続を更新する
 }

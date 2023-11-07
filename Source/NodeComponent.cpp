@@ -288,7 +288,7 @@ NodeComponent::NodeComponent(juce::Component* parentToAttachIO)
 {
     DBG("NodeComponent");
     setSize(800, 600);
-    
+    /*
     addNodeIO<InputNodeIO>(juce::Point<float>(-10, 20), parentToAttachIO);
     addNodeIO<OutputNodeIO>(juce::Point<float>(90, 20), parentToAttachIO);
     // ヘッダーにタイトルを設定
@@ -299,6 +299,7 @@ NodeComponent::NodeComponent(juce::Component* parentToAttachIO)
     auto& slider = bodyComponent.addCustomComponent<juce::Slider>();
     addAndMakeVisible(bodyComponent);  // ボディを可視にする
     headerComponent.toFront(true);
+     */
 }
 
 void NodeComponent::setBounds(int x, int y, int w, int h)
