@@ -11,11 +11,10 @@
 #include "BaseEffect.h"
 
 
-BaseEffect::BaseEffect(const juce::String& effectName)
-: name(effectName), numInputs(0), numOutputs(0), AudioProcessor (BusesProperties()
-  .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-  .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-  )  {
+BaseEffect::BaseEffect(const juce::String& effectName, int numInputChannels, int numOutputChannels)
+: name(effectName), numInputs(numInputChannels), numOutputs(numOutputChannels), AudioProcessor(BusesProperties()
+.withInput("Input", juce::AudioChannelSet::discreteChannels(numInputChannels), numInputChannels > 0)
+.withOutput("Output", juce::AudioChannelSet::discreteChannels(numOutputChannels), numOutputChannels > 0))  {
     // コンストラクタの初期化リストでメンバ変数を初期化
     position = juce::Point<int>(0,0);
 }

@@ -110,11 +110,6 @@ void NodePluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     inputEffect = createEffect<InputEffector>();
     outputEffect = createEffect<OutputEffector>();
     
-    DBG(juce::String(dawInputNode->nodeID.uid));
-    DBG(juce::String(findNodeForProcessor(inputEffect)->nodeID.uid));
-    DBG(juce::String(findNodeForProcessor(outputEffect)->nodeID.uid));
-    DBG(juce::String(dawOutputNode->nodeID.uid));
-    
     audioGraph.addConnection({{dawInputNode->nodeID, 0}, {findNodeForProcessor(inputEffect)->nodeID, 0}});
     audioGraph.addConnection({{dawInputNode->nodeID, 1}, {findNodeForProcessor(inputEffect)->nodeID, 1}});
     
@@ -123,13 +118,7 @@ void NodePluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     
     audioGraph.addConnection({{findNodeForProcessor(inputEffect)->nodeID, 0}, {findNodeForProcessor(outputEffect)->nodeID, 0}});
     audioGraph.addConnection({{findNodeForProcessor(inputEffect)->nodeID, 1}, {findNodeForProcessor(outputEffect)->nodeID, 1}});
-    //audioGraph.addConnection({{dawInputNode->nodeID, 0}, {dawOutputNode->nodeID, 0}});
-    //audioGraph.addConnection({{dawInputNode->nodeID, 1}, {dawOutputNode->nodeID, 1}});
     
-    
-    for (BaseEffect* effect : effects) {
-        DBG(effect->getName());
-    }
 }
 
 void NodePluginAudioProcessor::releaseResources()

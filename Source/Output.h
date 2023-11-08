@@ -14,10 +14,9 @@
 
 class OutputEffector : public BaseEffect {
 public:
-    OutputEffector() : BaseEffect("OutputEffect"){
+    OutputEffector() : BaseEffect("OutputEffect",2,2){
         setNumInputs(2);
         setNumOutputs(0);
-        DBG("createInput");
     }
 
     ~OutputEffector() override {}
@@ -28,6 +27,7 @@ public:
 
     void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) override {
         // 必要に応じてバッファの内容を確認
+        /*
         for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
         {
             // チャンネルごとの最初の10サンプルを出力
@@ -38,6 +38,7 @@ public:
             }
             DBG(channelData);
         }
+         */
     }
     
     bool isBusesLayoutSupported(const BusesLayout& layouts) const override {

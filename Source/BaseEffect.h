@@ -13,7 +13,7 @@
 
 class BaseEffect : public juce::AudioProcessor {
 public:
-    explicit BaseEffect(const juce::String& effectName);
+    explicit BaseEffect(const juce::String& effectName, int numInputChannels, int numOutputChannels);
     virtual ~BaseEffect();
 
     // 共通の初期化処理
