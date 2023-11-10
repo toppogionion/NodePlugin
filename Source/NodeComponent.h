@@ -16,7 +16,7 @@
 class NodeIO : public juce::Component,public juce::DragAndDropTarget
 {
 public:
-    NodeIO(juce::Point<float> );
+    NodeIO(NodeComponent*, juce::Point<float> ,int);
     
     void paint(juce::Graphics& ) override;
     
@@ -32,9 +32,7 @@ public:
 
     void itemDragExit(const SourceDetails &) override;
     
-    juce::Uuid getUUID();
-    
-    void setConnectedIO(NodeIO* );
+    virtual void setConnectedIO(NodeIO* ) = 0;
 
     NodeIO* getConnectedIO();
     
@@ -48,14 +46,22 @@ public:
     
     void setCurrentColour(const juce::Colour& );
     
-    virtual juce::String getType() const ;
+    virtual juce::String getType() const;
+    
+    void setChannel(int);
+    
+    int getChannel();
+    
+    NodeComponent* getParentNodeComponent();
     
 private:
-    juce::Uuid thisIOUuid;
-    juce::Uuid connectedIOUuid = juce::Uuid::null();
-    NodeIO* connectedIO = nullptr;
     juce::Colour currentColour;
     juce::Point<float> LocalPosition = juce::Point<float>(0,0);
+    NodeComponent* parentNodeComponent;
+    int channel;
+    
+protected:
+    NodeIO* connectedIO = nullptr;
 };
 
 
@@ -65,12 +71,13 @@ private:
 class InputNodeIO : public NodeIO
 {
 public :
-    InputNodeIO(juce::Point<float> );
+    InputNodeIO(NodeComponent* ,juce::Point<float> ,int );
     
     bool isInterestedInDragSource(const SourceDetails& ) override;
     
     juce::String getType() const override;
 
+    void setConnectedIO(NodeIO* ) override;
 };
 
 
@@ -80,12 +87,13 @@ public :
 class OutputNodeIO : public NodeIO
 {
 public :
-    OutputNodeIO(juce::Point<float> );
+    OutputNodeIO(NodeComponent* ,juce::Point<float> ,int );
 
     bool isInterestedInDragSource(const SourceDetails& ) override;
     
     juce::String getType() const override;
 
+    void setConnectedIO(NodeIO* ) override;
 };
 
 
@@ -147,10 +155,10 @@ public:
     NodeComponent(BaseEffect*, juce::Component* );
     
     template <typename NodeIOType>
-    void addNodeIO(juce::Point<float> localPosition, juce::Component* parentToAttachIO)
+    void addNodeIO(juce::Point<float> localPosition, juce::Component* parentToAttachIO, int channel)
     {
         // NodeIOの生成
-        auto newNodeIO = std::make_unique<NodeIOType>(localPosition);
+        auto newNodeIO = std::make_unique<NodeIOType>(this,localPosition,channel);
         // NodeIOを指定された親コンポーネントに追加
         parentToAttachIO->addAndMakeVisible(newNodeIO.get());
         nodeIOList.push_back(std::move(newNodeIO));
@@ -177,6 +185,8 @@ public:
     void addListener(NodeComponentListener* );
 
     void removeListener(NodeComponentListener* );
+    
+    BaseEffect* getEffect();
     
 private:
     juce::Point<int> originalPosition;

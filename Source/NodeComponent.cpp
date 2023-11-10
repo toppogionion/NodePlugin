@@ -10,7 +10,7 @@
 
 #include "NodeComponent.h"
 
-NodeIO::NodeIO(juce::Point<float> lPosition)
+NodeIO::NodeIO(NodeComponent* parentComponent, juce::Point<float> lPosition,int channel):parentNodeComponent(parentComponent),channel(channel)
 {
     DBG("NodeIO");
     setSize(20, 20);
@@ -44,6 +44,13 @@ void NodeIO::mouseDrag(const juce::MouseEvent& e)
         juce::var dragDescription = getType();
         dragContainer->startDragging(dragDescription, this);
     }
+    
+    if(connectedIO){
+        connectedIO -> setConnectedIO(nullptr);
+        setConnectedIO(nullptr);
+        auto topLevel = getTopLevelComponent(this);
+        topLevel->repaint();
+    }
 }
 
 bool NodeIO::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
@@ -73,9 +80,6 @@ void NodeIO::itemDropped(const SourceDetails& dragSourceDetails)
         setConnectedIO(sourceNodeIO);
         sourceNodeIO->setConnectedIO(this);
         
-        DBG("source: "+ getUUID().toString());
-        DBG("connected: "+ connectedIO->getUUID().toString());
-        
         // 可視化を更新するためのrepaint
         currentColour = juce::Colours::green;
         sourceNodeIO->setCurrentColour(juce::Colours::green);
@@ -96,16 +100,6 @@ void NodeIO::itemDragExit(const SourceDetails &dragSourceDetails)
     // Revert appearance change
     setCurrentColour(juce::Colours::lightgrey);
     repaint();
-}
-
-juce::Uuid NodeIO::getUUID(){
-    return thisIOUuid;
-}
-
-void NodeIO::setConnectedIO(NodeIO* otherIO)
-{
-    connectedIO = otherIO;
-    if(connectedIO == nullptr)setCurrentColour(juce::Colours::lightgrey);
 }
 
 NodeIO* NodeIO::getConnectedIO()
@@ -161,11 +155,14 @@ void NodeIO::setCurrentColour(const juce::Colour& colour)
 
 juce::String NodeIO::getType() const {return "NodeIO";}
 
+int NodeIO::getChannel() {return channel;}
+
+NodeComponent* NodeIO::getParentNodeComponent(){return parentNodeComponent;}
 
 //==============================================================================
 
 
-InputNodeIO::InputNodeIO(juce::Point<float> lPosition) : NodeIO(lPosition)
+InputNodeIO::InputNodeIO(NodeComponent* parentComponent,juce::Point<float> lPosition, int channel) : NodeIO(parentComponent,lPosition,channel)
 {
     DBG("Input");
     setSize(20, 20);
@@ -176,17 +173,27 @@ InputNodeIO::InputNodeIO(juce::Point<float> lPosition) : NodeIO(lPosition)
 bool InputNodeIO::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
     // 他のNodeIOからのドラッグを受け入れる場合に真を返します
-    DBG(dragSourceDetails.description.toString());
+    //DBG(dragSourceDetails.description.toString());
     return dragSourceDetails.description.toString() == "OutputIO";
 }
 
 juce::String InputNodeIO::getType() const  { return "InputIO"; }
 
-
+void InputNodeIO::setConnectedIO(NodeIO* otherIO)
+{
+    connectedIO = otherIO;
+    if(connectedIO == nullptr){
+        getParentNodeComponent()->getEffect()->disconnectEffectToInput(getChannel());
+        setCurrentColour(juce::Colours::lightgrey);
+    }else{
+        getParentNodeComponent()->getEffect()->connectEffectToInput(getChannel(),otherIO->getParentNodeComponent()->getEffect(),otherIO->getChannel());
+        setCurrentColour(juce::Colours::green);
+    }
+}
 //==============================================================================
 
 
-OutputNodeIO::OutputNodeIO(juce::Point<float> lPosition) : NodeIO(lPosition)
+OutputNodeIO::OutputNodeIO(NodeComponent* parentComponent,juce::Point<float> lPosition,int channel) : NodeIO(parentComponent,lPosition,channel)
 {
     DBG("Output");
     setSize(20, 20);
@@ -197,13 +204,23 @@ OutputNodeIO::OutputNodeIO(juce::Point<float> lPosition) : NodeIO(lPosition)
 bool OutputNodeIO::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
 {
     // 他のNodeIOからのドラッグを受け入れる場合に真を返します
-    DBG(dragSourceDetails.description.toString());
+    //DBG(dragSourceDetails.description.toString());
     return dragSourceDetails.description.toString() == "InputIO";
 }
 
 juce::String OutputNodeIO::getType() const  { return "OutputIO"; }
 
-
+void OutputNodeIO::setConnectedIO(NodeIO* otherIO)
+{
+    connectedIO = otherIO;
+    if(connectedIO == nullptr){
+        getParentNodeComponent()->getEffect()->disconnectEffectToOutput(getChannel());
+        setCurrentColour(juce::Colours::lightgrey);
+    }else{
+        getParentNodeComponent()->getEffect()->connectEffectToOutput(getChannel(),otherIO->getParentNodeComponent()->getEffect(),otherIO->getChannel());
+        setCurrentColour(juce::Colours::green);
+    }
+}
 //==============================================================================
 
 HeaderComponent::HeaderComponent()
@@ -393,7 +410,7 @@ void NodeComponent::mouseDown(const juce::MouseEvent& e)
 
 void NodeComponent::mouseDrag(const juce::MouseEvent& e)
 {
-    DBG("Drag");
+    //DBG("Drag");
     if (e.mods.isLeftButtonDown()){
         setTopLeftPosition(originalPosition + e.getOffsetFromDragStart());
         effect -> setPosition(originalPosition + e.getOffsetFromDragStart());
@@ -408,7 +425,7 @@ void NodeComponent::mouseUp(const juce::MouseEvent& e)
 {
     if (e.mods.isLeftButtonDown()) // 左クリックの場合
     {
-        DBG("UP");
+        //DBG("UP");
         effect -> setPosition(originalPosition + e.getOffsetFromDragStart());
         setTopLeftPosition(originalPosition + e.getOffsetFromDragStart());
         dragging = false;
@@ -429,6 +446,8 @@ std::vector<juce::Path> NodeComponent::getConnectedPaths()
 
     return PathArray;
 }
+
+BaseEffect* NodeComponent::getEffect(){return effect;}
 
 void NodeComponent::addListener(NodeComponentListener* listener)
 {

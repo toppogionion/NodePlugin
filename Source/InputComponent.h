@@ -20,7 +20,9 @@ public:
     {
         setSize(100, 200);
         
-        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 20), parentToAttachIO); // InputComponentにはOutputNodeIOを追加
+        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 20), parentToAttachIO, 0); // InputComponentにはOutputNodeIOを追加
+        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 40), parentToAttachIO, 1); // InputComponentにはOutputNodeIOを追加
+        
         // ヘッダーにタイトルを設定
         headerComponent.setTitle("Input");
         addAndMakeVisible(headerComponent);  // ヘッダーを可視にする

@@ -27,6 +27,7 @@ NodePluginAudioProcessorEditor::NodePluginAudioProcessorEditor (NodePluginAudioP
         newNode->addListener(this);
         nodeList.push_back(std::move(newNode));
     }
+    
     repaint();
 }
 

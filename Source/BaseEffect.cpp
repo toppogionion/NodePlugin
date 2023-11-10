@@ -54,8 +54,8 @@ void BaseEffect::connectEffectToOutput(int outputChannel, BaseEffect* effect, in
 
 void BaseEffect::disconnectEffectToOutput(int outputChannel) {
     if (outputChannel < outputConnections.size()) {
-        BaseEffect* effect = inputConnections[outputChannel].connectedEffect;
-        int targetChannel = inputConnections[outputChannel].channel;
+        BaseEffect* effect = outputConnections[outputChannel].connectedEffect;
+        int targetChannel = outputConnections[outputChannel].channel;
         processor.disconnectGraph(this, outputChannel, effect, targetChannel);
         
         outputConnections[outputChannel].connectedEffect = nullptr;
