@@ -16,6 +16,9 @@
         <FILE id="SyDceC" name="Output.h" compile="0" resource="0" file="Source/Output.h"/>
         <FILE id="BHpcry" name="OutputComponent.h" compile="0" resource="0"
               file="Source/OutputComponent.h"/>
+        <FILE id="Orf3g7" name="Through.h" compile="0" resource="0" file="Source/Through.h"/>
+        <FILE id="jVoR4y" name="ThroughComponent.h" compile="0" resource="0"
+              file="Source/ThroughComponent.h"/>
       </GROUP>
       <FILE id="Mntv5c" name="NodeComponentListener.h" compile="0" resource="0"
             file="Source/NodeComponentListener.h"/>

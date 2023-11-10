@@ -94,17 +94,12 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
             }
             else if (result == 1)
             {
-                DBG("make Node");
-                // user picked item 1
-                /*
-                // NodeComponent を作成してキャンバスに追加
-                auto newNode = std::make_unique<NodeComponent>(this);
-                newNode->setBounds(e.getPosition().x, e.getPosition().y, 100, 100);
+                BaseEffect* effect = audioProcessor.createEffect<ThroughEffector>();
+                effect->setPosition(juce::Point<int>(e.getPosition().x, e.getPosition().y));
+                std::unique_ptr<NodeComponent> newNode =  EffectComponentFactory::createComponent(effect, this);
                 addAndMakeVisible(newNode.get());
                 newNode->addListener(this);
-                // オブジェクトの所有権をコンポーネントに移す（必要ならば）
                 nodeList.push_back(std::move(newNode));
-                 */
             }
         });
     }
@@ -112,6 +107,7 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
 
 void NodePluginAudioProcessorEditor::nodeComponentWillBeDeleted(NodeComponent* nodeComponent)
 {
+    audioProcessor.deleteEffect(nodeComponent->getEffect());
     nodeList.erase(std::remove_if(nodeList.begin(), nodeList.end(),
                                   [nodeComponent](const std::unique_ptr<NodeComponent>& ptr)
                                   {
