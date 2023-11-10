@@ -93,12 +93,8 @@ public:
     
     std::vector<BaseEffect*> getEffects();
     
-    bool isOutputReachableFromAnyNode(BaseEffect* startEffect,BaseEffect* endEffect) ;
-    
 private:
     //==============================================================================
-    BaseEffect* inputEffect;
-    BaseEffect* outputEffect;
     juce::AudioProcessorGraph audioGraph;
     juce::AudioProcessorGraph::Node::Ptr  dawInputNode;
     juce::AudioProcessorGraph::Node::Ptr  dawOutputNode;

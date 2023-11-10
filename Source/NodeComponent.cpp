@@ -301,23 +301,17 @@ NodeComponent::NodeComponent(BaseEffect* effect,juce::Component* parentToAttachI
     headerComponent.toFront(true);
      */
 }
-
-void NodeComponent::setBounds(int x, int y, int w, int h)
-{
-    juce::Component::setBounds(x, y, w, h);
-    updateNodeIOPosition();
-}
-
 void NodeComponent::translate(juce::Point<int> deltaPos)
 {
-    auto currentPosition = getPosition();
+    auto currentPosition = effect->getPosition();
+    effect -> setPosition(currentPosition + deltaPos);
     setTopLeftPosition(currentPosition + deltaPos);
     updateNodeIOPosition();
 }
 
 void NodeComponent::updateNodeIOPosition()
 {
-    auto position = getPosition();
+    auto position = effect->getPosition();
     for(auto&nodeIO :nodeIOList){
         juce::Point<float> localIOPosition = nodeIO->getLocalPosition();
         nodeIO->setTopLeftPosition(position.x + localIOPosition.x, position.y + localIOPosition.y);
@@ -326,6 +320,8 @@ void NodeComponent::updateNodeIOPosition()
 
 void NodeComponent::paint(juce::Graphics& g)
 {
+    setTopLeftPosition(effect->getPosition());
+    updateNodeIOPosition();
     g.setColour(juce::Colours::blue);
     g.fillRect(getLocalBounds());
 }
@@ -386,7 +382,7 @@ void NodeComponent::mouseDown(const juce::MouseEvent& e)
     }
     else if (e.mods.isLeftButtonDown()) // 左クリックの場合だけ
     {
-        originalPosition = getPosition();
+        originalPosition = effect->getPosition();
         dragging = true;
         for(auto&nodeIO :nodeIOList){
             nodeIO -> toFront(true);
@@ -400,6 +396,7 @@ void NodeComponent::mouseDrag(const juce::MouseEvent& e)
     DBG("Drag");
     if (e.mods.isLeftButtonDown()){
         setTopLeftPosition(originalPosition + e.getOffsetFromDragStart());
+        effect -> setPosition(originalPosition + e.getOffsetFromDragStart());
         updateNodeIOPosition();
         
         auto topLevel = getTopLevelComponent(this);
@@ -412,6 +409,7 @@ void NodeComponent::mouseUp(const juce::MouseEvent& e)
     if (e.mods.isLeftButtonDown()) // 左クリックの場合
     {
         DBG("UP");
+        effect -> setPosition(originalPosition + e.getOffsetFromDragStart());
         setTopLeftPosition(originalPosition + e.getOffsetFromDragStart());
         dragging = false;
     }

@@ -156,8 +156,6 @@ public:
         nodeIOList.push_back(std::move(newNodeIO));
     }
     
-    void setBounds(int x, int y, int w, int h);
-    
     void translate(juce::Point<int> );
     
     void updateNodeIOPosition();
