@@ -13,3 +13,20 @@
 #include "NodeComponent.h"
 #include "InputComponent.h"
 #include "OutputComponent.h"
+
+class NodeComponent;
+class BaseEffect;
+
+struct EffectComponentFactory {
+    static std::unique_ptr<NodeComponent> createComponent(BaseEffect* effect, juce::Component* editor) {
+        juce::String effectType = effect->getName();
+        if (effectType == "Input") {
+            return std::make_unique<InputComponent>(static_cast<InputEffector*>(effect), editor);
+        } else if (effectType == "Output") {
+            return std::make_unique<OutputComponent>(static_cast<OutputEffector*>(effect), editor);
+        } else {
+            // 未知のEffectタイプの場合
+            return nullptr;
+        }
+    }
+};

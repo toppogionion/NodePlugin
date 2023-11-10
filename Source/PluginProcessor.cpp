@@ -115,10 +115,6 @@ void NodePluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     
     audioGraph.addConnection({{findNodeForProcessor(outputEffect)->nodeID, 0}, {dawOutputNode->nodeID, 0}});
     audioGraph.addConnection({{findNodeForProcessor(outputEffect)->nodeID, 1}, {dawOutputNode->nodeID, 1}});
-    
-    audioGraph.addConnection({{findNodeForProcessor(inputEffect)->nodeID, 0}, {findNodeForProcessor(outputEffect)->nodeID, 0}});
-    audioGraph.addConnection({{findNodeForProcessor(inputEffect)->nodeID, 1}, {findNodeForProcessor(outputEffect)->nodeID, 1}});
-    
 }
 
 void NodePluginAudioProcessor::releaseResources()
@@ -212,11 +208,10 @@ void NodePluginAudioProcessor::connectGraph(BaseEffect* outputEffect, int output
 }
 
 // エフェクトの接続を解除する
-void NodePluginAudioProcessor::disconnectGraph(BaseEffect* effect) {
-    auto node = findNodeForProcessor(effect);
-    if (node) {
-        audioGraph.disconnectNode(node->nodeID);
-    }
+void NodePluginAudioProcessor::disconnectGraph(BaseEffect* outputEffect, int outputChannel, BaseEffect* inputEffect, int inputChannel) {
+    auto outputNode = findNodeForProcessor(outputEffect);
+    auto inputNode = findNodeForProcessor(inputEffect);
+    audioGraph.removeConnection({ {outputNode->nodeID, outputChannel}, {inputNode->nodeID, inputChannel} });
 }
 
 // ヘルパー関数: プロセッサに対応するノードを見つける
@@ -269,6 +264,10 @@ bool NodePluginAudioProcessor::isOutputReachableFromAnyNode(BaseEffect* startEff
 
     // 出力ノードに至る経路が見つからなければ false
     return false;
+}
+
+std::vector<BaseEffect*> NodePluginAudioProcessor::getEffects(){
+    return effects;
 }
 
 //==============================================================================

@@ -4,6 +4,8 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="WpsWV5" name="NodePlugin">
     <GROUP id="{84AF3384-F44E-9A6C-1578-664E1DC402F3}" name="Source">
+      <FILE id="aaLAqM" name="IPluginProcessor.h" compile="0" resource="0"
+            file="Source/IPluginProcessor.h"/>
       <FILE id="IRLWFx" name="EffectComponents.h" compile="0" resource="0"
             file="Source/EffectComponents.h"/>
       <GROUP id="{57C34172-EBFA-7077-DC7B-1426ACECEBDF}" name="Effects">

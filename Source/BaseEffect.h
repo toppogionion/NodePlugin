@@ -10,10 +10,11 @@
 
 #pragma once
 #include <JuceHeader.h>
+#include "IPluginProcessor.h"
 
 class BaseEffect : public juce::AudioProcessor {
 public:
-    explicit BaseEffect(const juce::String& effectName, int numInputChannels, int numOutputChannels);
+    explicit BaseEffect(IPluginProcessor& proc,const juce::String& effectName, int numInputChannels, int numOutputChannels);
     virtual ~BaseEffect();
 
     // 共通の初期化処理
@@ -50,9 +51,10 @@ public:
     std::vector<Connection> outputConnections; // 出力接続のベクトル
     
     // 特定のチャンネルにエフェクトを接続
-    void connectEffectToInput(int inputChannel, BaseEffect* effect) ;
-
-    void connectEffectToOutput(int outputChannel, BaseEffect* effect);
+    void connectEffectToInput(int inputChannel, BaseEffect* effect, int targetChannel) ;
+    void disconnectEffectToInput(int inputChannel) ;
+    void connectEffectToOutput(int outputChannel, BaseEffect* effect, int targetChannel);
+    void disconnectEffectToOutput(int outputChannel);
     
     // UI関連の情報
     juce::Point<int> position; // エフェクトのUI位置
@@ -60,9 +62,8 @@ public:
     int numOutputs; // 出力端子の数
 
     // UI関連の情報を設定・取得するための関数
-    void setPosition(const juce::Point<int>& newPosition);
+    void setPosition(const juce::Point<int> newPosition);
     juce::Point<int> getPosition() const;
-    void setName(const juce::String& newName);
     const juce::String getName() const override;
     void setNumInputs(int newNumInputs);
     int getNumInputs() const;
@@ -70,4 +71,6 @@ public:
     int getNumOutputs() const;
     
     juce::String name; // エフェクトの名前
+
+    IPluginProcessor& processor;
 };

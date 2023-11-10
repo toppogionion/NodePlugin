@@ -11,13 +11,14 @@
 #pragma once
 #include <JuceHeader.h>
 #include "NodeComponent.h"
+#include "Input.h"
 
 class InputComponent : public NodeComponent
 {
 public:
-    InputComponent(juce::Component* parentToAttachIO) : NodeComponent(parentToAttachIO)
+    InputComponent(InputEffector* effect,juce::Component* parentToAttachIO) : NodeComponent(effect,parentToAttachIO)
     {
-        setSize(800, 600);
+        setSize(100, 200);
         
         addNodeIO<OutputNodeIO>(juce::Point<float>(90, 20), parentToAttachIO); // InputComponentにはOutputNodeIOを追加
         // ヘッダーにタイトルを設定
@@ -27,4 +28,6 @@ public:
         addAndMakeVisible(bodyComponent);  // ボディを可視にする
         headerComponent.toFront(true);
     }
+private:
+    InputEffector* inputEffect;
 };

@@ -14,10 +14,11 @@
 
 class InputEffector : public BaseEffect {
 public:
-    InputEffector() : BaseEffect("InputEffect",2,2)
+    InputEffector(IPluginProcessor& proc) : BaseEffect(proc,"Input",2,2)
     {
         setNumInputs(0);  // InputEffect には入力がありません。
         setNumOutputs(2); // DAWへの出力を1つ持ちます。
+        setPosition(juce::Point<int>(100,100));
     }
 
     ~InputEffector() override {}
@@ -51,7 +52,7 @@ public:
             }
             DBG(channelData);
         }
-         */
+        */
     }
     
     bool isBusesLayoutSupported(const BusesLayout& layouts) const override {

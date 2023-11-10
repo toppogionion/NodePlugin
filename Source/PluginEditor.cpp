@@ -18,9 +18,16 @@ NodePluginAudioProcessorEditor::NodePluginAudioProcessorEditor (NodePluginAudioP
     // ウィンドウのサイズ変更を有効にする
     setResizable(true, true);
     setResizeLimits(400, 300, 1200, 800); // ウィンドウの最小サイズと最大サイズを設定
-
+    
     setSize (800, 600);
-            
+    
+    for (auto& effect : audioProcessor.getEffects()){
+        std::unique_ptr<NodeComponent> newNode =  EffectComponentFactory::createComponent(effect, this);
+        addAndMakeVisible(newNode.get());
+        newNode->addListener(this);
+        nodeList.push_back(std::move(newNode));
+    }
+    repaint();
 }
 
 NodePluginAudioProcessorEditor::~NodePluginAudioProcessorEditor()

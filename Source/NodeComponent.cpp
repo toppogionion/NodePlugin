@@ -284,7 +284,7 @@ void BodyComponent::resized()
 //==============================================================================
 
 
-NodeComponent::NodeComponent(juce::Component* parentToAttachIO)
+NodeComponent::NodeComponent(BaseEffect* effect,juce::Component* parentToAttachIO):effect(effect)
 {
     DBG("NodeComponent");
     setSize(800, 600);

@@ -10,11 +10,12 @@
 
 #include <JuceHeader.h>
 #include "Effects.h"
+#include "IPluginProcessor.h"
 
 //==============================================================================
 /**
 */
-class NodePluginAudioProcessor  : public juce::AudioProcessor
+class NodePluginAudioProcessor  : public juce::AudioProcessor,public IPluginProcessor
                             #if JucePlugin_Enable_ARA
                              , public juce::AudioProcessorARAExtension
                             #endif
@@ -57,10 +58,10 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void addGraph(std::unique_ptr<BaseEffect> effect);
-    void removeGraph(BaseEffect* effect);
-    void connectGraph(BaseEffect* outputEffect, int outputChannel, BaseEffect* inputEffect, int inputChannel);
-    void disconnectGraph(BaseEffect* effect);
+    void addGraph(std::unique_ptr<BaseEffect> effect) override;
+    void removeGraph(BaseEffect* effect) override;
+    void connectGraph(BaseEffect* outputEffect, int outputChannel, BaseEffect* inputEffect, int inputChannel) override;
+    void disconnectGraph(BaseEffect* outputEffect, int outputChannel, BaseEffect* inputEffect, int inputChannel) override;
     
     juce::AudioProcessorGraph::Node::Ptr findNodeForProcessor(BaseEffect* processor);
 
@@ -68,7 +69,7 @@ public:
     BaseEffect* createEffect()
     {
         // Effectの生成
-        auto newEffect = std::make_unique<EffectType>();
+        auto newEffect = std::make_unique<EffectType>(*this);
         // addGraphに渡す前に一時的なポインタを取得
         BaseEffect* effectPtr = newEffect.get();
         // グラフにエフェクトを追加
@@ -79,7 +80,7 @@ public:
         return effectPtr;
     }
     
-    void deleteEffect(BaseEffect* effect) {
+    void deleteEffect(BaseEffect* effect) override{
         // AudioProcessorGraph からノードを削除する処理
         removeGraph(effect);
 
@@ -89,6 +90,8 @@ public:
             effects.erase(it); // ベクトルからエフェクトを削除
         }
     }
+    
+    std::vector<BaseEffect*> getEffects();
     
     bool isOutputReachableFromAnyNode(BaseEffect* startEffect,BaseEffect* endEffect) ;
     

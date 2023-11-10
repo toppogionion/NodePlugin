@@ -11,6 +11,7 @@
 #pragma once
 #include <JuceHeader.h>
 #include "NodeComponentListener.h"
+#include "BaseEffect.h"
 
 class NodeIO : public juce::Component,public juce::DragAndDropTarget
 {
@@ -143,7 +144,7 @@ private:
 class NodeComponent : public juce::Component
 {
 public:
-    NodeComponent(juce::Component* );
+    NodeComponent(BaseEffect*, juce::Component* );
     
     template <typename NodeIOType>
     void addNodeIO(juce::Point<float> localPosition, juce::Component* parentToAttachIO)
@@ -183,9 +184,10 @@ private:
     juce::Point<int> originalPosition;
     bool dragging = false;
     std::vector<std::unique_ptr<NodeIO>> nodeIOList;
+    BaseEffect* effect;
+    juce::ListenerList<NodeComponentListener> listeners;
     
 protected:
     HeaderComponent headerComponent;
     BodyComponent bodyComponent;
-    juce::ListenerList<NodeComponentListener> listeners;
 };

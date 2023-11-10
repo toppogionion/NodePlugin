@@ -14,9 +14,11 @@
 
 class OutputEffector : public BaseEffect {
 public:
-    OutputEffector() : BaseEffect("OutputEffect",2,2){
+    OutputEffector(IPluginProcessor& proc) : BaseEffect(proc,"Output",2,2)
+    {
         setNumInputs(2);
         setNumOutputs(0);
+        setPosition(juce::Point<int>(300,100));
     }
 
     ~OutputEffector() override {}
@@ -38,7 +40,7 @@ public:
             }
             DBG(channelData);
         }
-         */
+        */
     }
     
     bool isBusesLayoutSupported(const BusesLayout& layouts) const override {
