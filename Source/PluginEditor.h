@@ -28,7 +28,6 @@ public:
     void mouseDrag(const juce::MouseEvent&) override;
     void mouseDown(const juce::MouseEvent&) override;
     void nodeComponentWillBeDeleted(NodeComponent* ) override;
-    void nodeComponentConnectionChanged(NodeComponent* ) override;
     
 private:
     // This reference is provided as a quick way for your editor to

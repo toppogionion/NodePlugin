@@ -110,11 +110,9 @@ void NodePluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     BaseEffect* inputEffect = createEffect<InputEffector>();
     BaseEffect* outputEffect = createEffect<OutputEffector>();
     
-    audioGraph.addConnection({{dawInputNode->nodeID, 0}, {findNodeForProcessor(inputEffect)->nodeID, 0}});
-    audioGraph.addConnection({{dawInputNode->nodeID, 1}, {findNodeForProcessor(inputEffect)->nodeID, 1}});
+    connectDAWInputGraph(inputEffect, true);
     
-    audioGraph.addConnection({{findNodeForProcessor(outputEffect)->nodeID, 0}, {dawOutputNode->nodeID, 0}});
-    audioGraph.addConnection({{findNodeForProcessor(outputEffect)->nodeID, 1}, {dawOutputNode->nodeID, 1}});
+    connectDAWOutputGraph(outputEffect, true);
 }
 
 void NodePluginAudioProcessor::releaseResources()
@@ -213,6 +211,17 @@ void NodePluginAudioProcessor::disconnectGraph(BaseEffect* outputEffect, int out
     auto inputNode = findNodeForProcessor(inputEffect);
     audioGraph.removeConnection({ {outputNode->nodeID, outputChannel}, {inputNode->nodeID, inputChannel} });
 }
+
+void NodePluginAudioProcessor::connectDAWInputGraph(BaseEffect* effect,bool isStereo){
+    audioGraph.addConnection({{dawInputNode->nodeID, 0}, {findNodeForProcessor(effect)->nodeID, 0}});
+    if(isStereo)audioGraph.addConnection({{dawInputNode->nodeID, 1}, {findNodeForProcessor(effect)->nodeID, 1}});
+} ;
+
+void NodePluginAudioProcessor::connectDAWOutputGraph(BaseEffect* effect,bool isStereo){
+    audioGraph.addConnection({{findNodeForProcessor(effect)->nodeID, 0}, {dawOutputNode->nodeID, 0}});
+    if(isStereo)audioGraph.addConnection({{findNodeForProcessor(effect)->nodeID, 1}, {dawOutputNode->nodeID, 1}});
+} ;
+
 
 // ヘルパー関数: プロセッサに対応するノードを見つける
 juce::AudioProcessorGraph::Node::Ptr NodePluginAudioProcessor::findNodeForProcessor(BaseEffect* processor) {

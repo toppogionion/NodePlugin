@@ -83,7 +83,9 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
     }
     if (e.mods.isRightButtonDown()){ // 右クリックの場合だけ
         juce::PopupMenu menu;
-        menu.addItem(1, "Add Node");
+        menu.addItem(1, "Input");
+        menu.addItem(2, "Output");
+        menu.addItem(3, "Through");
         
         menu.showMenuAsync (juce::PopupMenu::Options(),
                             [this,e] (int result)
@@ -93,6 +95,26 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
                 // user dismissed the menu without picking anything
             }
             else if (result == 1)
+            {
+                BaseEffect* effect = audioProcessor.createEffect<InputEffector>();
+                effect->setPosition(juce::Point<int>(e.getPosition().x, e.getPosition().y));
+                std::unique_ptr<NodeComponent> newNode =  EffectComponentFactory::createComponent(effect, this);
+                addAndMakeVisible(newNode.get());
+                newNode->addListener(this);
+                nodeList.push_back(std::move(newNode));
+                audioProcessor.connectDAWInputGraph(effect, true);
+            }
+            else if (result == 2)
+            {
+                BaseEffect* effect = audioProcessor.createEffect<OutputEffector>();
+                effect->setPosition(juce::Point<int>(e.getPosition().x, e.getPosition().y));
+                std::unique_ptr<NodeComponent> newNode =  EffectComponentFactory::createComponent(effect, this);
+                addAndMakeVisible(newNode.get());
+                newNode->addListener(this);
+                nodeList.push_back(std::move(newNode));
+                audioProcessor.connectDAWOutputGraph(effect, true);
+            }
+            else if (result == 3)
             {
                 BaseEffect* effect = audioProcessor.createEffect<ThroughEffector>();
                 effect->setPosition(juce::Point<int>(e.getPosition().x, e.getPosition().y));
@@ -115,10 +137,4 @@ void NodePluginAudioProcessorEditor::nodeComponentWillBeDeleted(NodeComponent* n
                                   }),
                    nodeList.end());
     repaint();
-}
-
-void NodePluginAudioProcessorEditor::nodeComponentConnectionChanged(NodeComponent* nodeComponent)
-{
-        // NodeComponentの接続状態が変更されたときの処理
-        // 例: AudioProcessorGraphの接続を更新する
 }

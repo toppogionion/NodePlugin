@@ -62,6 +62,8 @@ public:
     void removeGraph(BaseEffect* effect) override;
     void connectGraph(BaseEffect* outputEffect, int outputChannel, BaseEffect* inputEffect, int inputChannel) override;
     void disconnectGraph(BaseEffect* outputEffect, int outputChannel, BaseEffect* inputEffect, int inputChannel) override;
+    void connectDAWInputGraph(BaseEffect* effect,bool isStereo) ;
+    void connectDAWOutputGraph(BaseEffect* effect,bool isStereo) ;
     
     juce::AudioProcessorGraph::Node::Ptr findNodeForProcessor(BaseEffect* processor);
 
