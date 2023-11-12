@@ -20,10 +20,10 @@ public:
     {
         setSize(100, 100);
         
-        addNodeIO<InputNodeIO>(juce::Point<float>(-10, 20), parentToAttachIO, 0);
-        addNodeIO<InputNodeIO>(juce::Point<float>(-10, 40), parentToAttachIO, 1);
-        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 20), parentToAttachIO, 0);
-        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 40), parentToAttachIO, 1);
+        addNodeIO<InputNodeIO>(juce::Point<float>(-10, 40), parentToAttachIO, 0);
+        addNodeIO<InputNodeIO>(juce::Point<float>(-10, 60), parentToAttachIO, 1);
+        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 40), parentToAttachIO, 0);
+        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 60), parentToAttachIO, 1);
         
         // ヘッダーにタイトルを設定
         headerComponent.setTitle("Through");

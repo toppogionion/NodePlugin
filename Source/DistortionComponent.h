@@ -47,14 +47,14 @@ public:
     void resized() override {
        // スライダーのサイズや位置を設定
        distortionSlider.setBounds(50, 50, 100, 100);
-   }
-   // Slider::Listenerインターフェースのメソッドを実装
-   void sliderValueChanged(juce::Slider* slider) override {
-       DBG("set");
-       if (slider == &distortionSlider) {
-           distortionEffect->setThreshold(distortionSlider.getValue());
-       }
-   }
+    }
+    // Slider::Listenerインターフェースのメソッドを実装
+    void sliderValueChanged(juce::Slider* slider) override {
+        DBG("set");
+        if (slider == &distortionSlider) {
+            distortionEffect->setThreshold(distortionSlider.getValue());
+        }
+    }
     
 private:
     DistortionEffector* distortionEffect;

@@ -110,6 +110,7 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
         menu.addItem(3, "Through");
         menu.addItem(4, "Distortion");
         menu.addItem(5, "Copy");
+        menu.addItem(6, "Delay");
         
         menu.showMenuAsync (juce::PopupMenu::Options(),
                             [this,e] (int result)
@@ -159,6 +160,15 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
             else if (result == 5)
             {
                 BaseEffect* effect = audioProcessor.createEffect<CopyEffector>();
+                effect->setPosition(juce::Point<int>(e.getPosition().x, e.getPosition().y));
+                std::unique_ptr<NodeComponent> newNode =  EffectComponentFactory::createComponent(effect, this);
+                addAndMakeVisible(newNode.get());
+                newNode->addListener(this);
+                nodeList.push_back(std::move(newNode));
+            }
+            else if (result == 6)
+            {
+                BaseEffect* effect = audioProcessor.createEffect<DelayEffector>();
                 effect->setPosition(juce::Point<int>(e.getPosition().x, e.getPosition().y));
                 std::unique_ptr<NodeComponent> newNode =  EffectComponentFactory::createComponent(effect, this);
                 addAndMakeVisible(newNode.get());

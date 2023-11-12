@@ -10,6 +10,9 @@
             file="Source/EffectComponents.h"/>
       <GROUP id="{57C34172-EBFA-7077-DC7B-1426ACECEBDF}" name="Effects">
         <FILE id="gRwqNE" name="Effects.h" compile="0" resource="0" file="Source/Effects.h"/>
+        <FILE id="F1mHI9" name="Delay.h" compile="0" resource="0" file="Source/Delay.h"/>
+        <FILE id="OFrwLT" name="DelayComponent.h" compile="0" resource="0"
+              file="Source/DelayComponent.h"/>
         <FILE id="AOqGII" name="Copy.h" compile="0" resource="0" file="Source/Copy.h"/>
         <FILE id="SjTFZ7" name="CopyComponent.h" compile="0" resource="0" file="Source/CopyComponent.h"/>
         <FILE id="mbf9gX" name="Distortion.h" compile="0" resource="0" file="Source/Distortion.h"/>
