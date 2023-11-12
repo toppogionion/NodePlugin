@@ -14,3 +14,4 @@
 #include "Output.h"
 #include "Through.h"
 #include "Distortion.h"
+#include "Copy.h"

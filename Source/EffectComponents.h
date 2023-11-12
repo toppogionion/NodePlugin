@@ -15,6 +15,7 @@
 #include "OutputComponent.h"
 #include "ThroughComponent.h"
 #include "DistortionComponent.h"
+#include "CopyComponent.h"
 
 class NodeComponent;
 class BaseEffect;
@@ -30,6 +31,8 @@ struct EffectComponentFactory {
             return std::make_unique<ThroughComponent>(static_cast<ThroughEffector*>(effect), editor);
         } else if (effectType == "Distortion") {
             return std::make_unique<DistortionComponent>(static_cast<DistortionEffector*>(effect), editor);
+        }else if (effectType == "Copy") {
+            return std::make_unique<CopyComponent>(static_cast<CopyEffector*>(effect), editor);
         }else {
             // 未知のEffectタイプの場合
             return nullptr;

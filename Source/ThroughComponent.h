@@ -18,7 +18,7 @@ class ThroughComponent : public NodeComponent
 public:
     ThroughComponent(ThroughEffector* effect,juce::Component* parentToAttachIO) : NodeComponent(effect,parentToAttachIO)
     {
-        setSize(100, 200);
+        setSize(100, 100);
         
         addNodeIO<InputNodeIO>(juce::Point<float>(-10, 20), parentToAttachIO, 0);
         addNodeIO<InputNodeIO>(juce::Point<float>(-10, 40), parentToAttachIO, 1);

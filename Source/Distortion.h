@@ -73,6 +73,7 @@ public:
         // ゲイン調整
         if (peakLevel != 0.0f) {
             float gainFactor = 1.0f / peakLevel;
+            DBG(juce::String(gainFactor));
             buffer.applyGain(gainFactor);
         }
     }
