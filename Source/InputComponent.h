@@ -18,10 +18,10 @@ class InputComponent : public NodeComponent
 public:
     InputComponent(InputEffector* effect,juce::Component* parentToAttachIO) : NodeComponent(effect,parentToAttachIO)
     {
-        setSize(100, 200);
+        setSize(100, 100);
         
-        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 20), parentToAttachIO, 0); // InputComponentにはOutputNodeIOを追加
-        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 40), parentToAttachIO, 1); // InputComponentにはOutputNodeIOを追加
+        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 40), parentToAttachIO, 0); // InputComponentにはOutputNodeIOを追加
+        addNodeIO<OutputNodeIO>(juce::Point<float>(90, 60), parentToAttachIO, 1); // InputComponentにはOutputNodeIOを追加
         
         // ヘッダーにタイトルを設定
         headerComponent.setTitle("Input");

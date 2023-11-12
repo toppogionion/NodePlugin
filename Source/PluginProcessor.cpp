@@ -209,7 +209,10 @@ void NodePluginAudioProcessor::connectGraph(BaseEffect* outputEffect, int output
 void NodePluginAudioProcessor::disconnectGraph(BaseEffect* outputEffect, int outputChannel, BaseEffect* inputEffect, int inputChannel) {
     auto outputNode = findNodeForProcessor(outputEffect);
     auto inputNode = findNodeForProcessor(inputEffect);
-    audioGraph.removeConnection({ {outputNode->nodeID, outputChannel}, {inputNode->nodeID, inputChannel} });
+    if (outputNode && inputNode) {
+        audioGraph.removeConnection({ {outputNode->nodeID, outputChannel}, {inputNode->nodeID, inputChannel} });
+    }
+    
 }
 
 void NodePluginAudioProcessor::connectDAWInputGraph(BaseEffect* effect,bool isStereo){

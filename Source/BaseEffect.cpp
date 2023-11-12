@@ -63,6 +63,14 @@ void BaseEffect::disconnectEffectToOutput(int outputChannel) {
     }
 }
 
+void BaseEffect::setNodeComponent(NodeComponent* newComponent){
+    nodeComponent = newComponent;
+};
+
+NodeComponent* BaseEffect::getNodeComponent(){
+    return  nodeComponent;
+};
+
 const juce::String BaseEffect::getName() const {
     return name; // 設定されたエフェクト名を返す
 }

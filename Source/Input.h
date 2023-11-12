@@ -40,7 +40,6 @@ public:
         // InputEffect は入力をそのまま出力に送るだけなので、ここでは何もしません。
         // 実際には入力を受け取り、それを処理するロジックが必要になります。
         // 必要に応じてバッファの内容を確認
-        /*
         for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
         {
             
@@ -50,9 +49,8 @@ public:
             {
                 channelData += juce::String(buffer.getSample(channel, sample)) + " ";
             }
-            DBG(channelData);
+            //DBG(channelData);
         }
-        */
     }
     
     bool isBusesLayoutSupported(const BusesLayout& layouts) const override {

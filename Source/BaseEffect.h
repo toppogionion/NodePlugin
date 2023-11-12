@@ -12,6 +12,8 @@
 #include <JuceHeader.h>
 #include "IPluginProcessor.h"
 
+class NodeComponent;
+
 class BaseEffect : public juce::AudioProcessor {
 public:
     explicit BaseEffect(IPluginProcessor& proc,const juce::String& effectName, int numInputChannels, int numOutputChannels);
@@ -62,6 +64,8 @@ public:
     int numOutputs; // 出力端子の数
 
     // UI関連の情報を設定・取得するための関数
+    void setNodeComponent(NodeComponent*);
+    NodeComponent* getNodeComponent();
     void setPosition(const juce::Point<int> newPosition);
     juce::Point<int> getPosition() const;
     const juce::String getName() const override;
@@ -73,4 +77,6 @@ public:
     juce::String name; // エフェクトの名前
 
     IPluginProcessor& processor;
+private:
+    NodeComponent* nodeComponent = nullptr;
 };

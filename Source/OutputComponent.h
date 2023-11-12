@@ -19,10 +19,10 @@ class OutputComponent : public NodeComponent
 public:
     OutputComponent(OutputEffector* effect,juce::Component* parentToAttachIO) : NodeComponent(effect,parentToAttachIO)
     {
-        setSize(100, 200);
+        setSize(100, 100);
         
-        addNodeIO<InputNodeIO>(juce::Point<float>(-10, 20), parentToAttachIO, 0); // InputComponentにはOutputNodeIOを追加
-        addNodeIO<InputNodeIO>(juce::Point<float>(-10, 40), parentToAttachIO, 1);
+        addNodeIO<InputNodeIO>(juce::Point<float>(-10, 40), parentToAttachIO, 0); // InputComponentにはOutputNodeIOを追加
+        addNodeIO<InputNodeIO>(juce::Point<float>(-10, 60), parentToAttachIO, 1);
         // ヘッダーにタイトルを設定
         headerComponent.setTitle("Output");
         addAndMakeVisible(headerComponent);  // ヘッダーを可視にする

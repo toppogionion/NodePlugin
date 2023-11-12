@@ -14,6 +14,7 @@
 #include "InputComponent.h"
 #include "OutputComponent.h"
 #include "ThroughComponent.h"
+#include "DistortionComponent.h"
 
 class NodeComponent;
 class BaseEffect;
@@ -27,7 +28,9 @@ struct EffectComponentFactory {
             return std::make_unique<OutputComponent>(static_cast<OutputEffector*>(effect), editor);
         } else if (effectType == "Through") {
             return std::make_unique<ThroughComponent>(static_cast<ThroughEffector*>(effect), editor);
-        } else {
+        } else if (effectType == "Distortion") {
+            return std::make_unique<DistortionComponent>(static_cast<DistortionEffector*>(effect), editor);
+        }else {
             // 未知のEffectタイプの場合
             return nullptr;
         }

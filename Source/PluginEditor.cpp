@@ -28,6 +28,28 @@ NodePluginAudioProcessorEditor::NodePluginAudioProcessorEditor (NodePluginAudioP
         nodeList.push_back(std::move(newNode));
     }
     
+    for (auto& sourceNode : nodeList){
+        if(!(sourceNode->getEffect()->getNumOutputs()>0))continue;
+        
+        for(auto& sourceNodeIO : sourceNode->getNodeIOList()){
+            int sourceChannel = sourceNodeIO->getChannel();
+         
+            BaseEffect* pretargetEffect = sourceNode->getEffect();
+            BaseEffect* targetEffect = pretargetEffect->outputConnections[sourceChannel].connectedEffect;
+            if(!targetEffect) break;
+            NodeComponent* targetNode = targetEffect->getNodeComponent();
+            int targetChannel = sourceNode->getEffect()->outputConnections[sourceChannel].channel;
+            
+            for(auto& targetNodeIO : targetNode->getNodeIOList()){
+                if(targetChannel==targetNodeIO->getChannel()){
+                    targetNodeIO -> setConnectedIO(sourceNodeIO.get());
+                    sourceNodeIO -> setConnectedIO(targetNodeIO.get());
+                    break;
+                }
+            }
+        }
+    }
+    
     repaint();
 }
 
@@ -86,6 +108,7 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
         menu.addItem(1, "Input");
         menu.addItem(2, "Output");
         menu.addItem(3, "Through");
+        menu.addItem(4, "Distortion");
         
         menu.showMenuAsync (juce::PopupMenu::Options(),
                             [this,e] (int result)
@@ -117,6 +140,15 @@ void NodePluginAudioProcessorEditor::mouseDown(const juce::MouseEvent& e)
             else if (result == 3)
             {
                 BaseEffect* effect = audioProcessor.createEffect<ThroughEffector>();
+                effect->setPosition(juce::Point<int>(e.getPosition().x, e.getPosition().y));
+                std::unique_ptr<NodeComponent> newNode =  EffectComponentFactory::createComponent(effect, this);
+                addAndMakeVisible(newNode.get());
+                newNode->addListener(this);
+                nodeList.push_back(std::move(newNode));
+            }
+            else if (result == 4)
+            {
+                BaseEffect* effect = audioProcessor.createEffect<DistortionEffector>();
                 effect->setPosition(juce::Point<int>(e.getPosition().x, e.getPosition().y));
                 std::unique_ptr<NodeComponent> newNode =  EffectComponentFactory::createComponent(effect, this);
                 addAndMakeVisible(newNode.get());

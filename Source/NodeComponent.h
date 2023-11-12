@@ -32,7 +32,9 @@ public:
 
     void itemDragExit(const SourceDetails &) override;
     
-    virtual void setConnectedIO(NodeIO* ) = 0;
+    void setConnectedIO(NodeIO* );
+    
+    virtual void connectEffect(NodeIO* ) = 0;
 
     NodeIO* getConnectedIO();
     
@@ -77,7 +79,7 @@ public :
     
     juce::String getType() const override;
 
-    void setConnectedIO(NodeIO* ) override;
+    void connectEffect(NodeIO* ) override;
 };
 
 
@@ -93,7 +95,7 @@ public :
     
     juce::String getType() const override;
 
-    void setConnectedIO(NodeIO* ) override;
+    void connectEffect(NodeIO* ) override;
 };
 
 
@@ -153,6 +155,7 @@ class NodeComponent : public juce::Component
 {
 public:
     NodeComponent(BaseEffect*, juce::Component* );
+    ~NodeComponent();
     
     template <typename NodeIOType>
     void addNodeIO(juce::Point<float> localPosition, juce::Component* parentToAttachIO, int channel)
@@ -187,6 +190,8 @@ public:
     void removeListener(NodeComponentListener* );
     
     BaseEffect* getEffect();
+    
+    std::vector<std::unique_ptr<NodeIO>>& getNodeIOList();
     
 private:
     juce::Point<int> originalPosition;
