@@ -3,7 +3,7 @@
 
     NodeComponent.h
     Created: 2 Nov 2023 7:10:38pm
-    Author: Toppogionion
+    Author:  須田丈晴
 
   ==============================================================================
 */
